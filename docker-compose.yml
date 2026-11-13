@@ -1,0 +1,23 @@
+services:
+  db:
+    # Official pgvector image: normal PostgreSQL 17 with the "vector" extension installed.
+    image: pgvector/pgvector:pg17
+    environment:
+      POSTGRES_USER: regs
+      POSTGRES_PASSWORD: regs   # local development only
+      POSTGRES_DB: regs
+    ports:
+      # Host port 5433 so it does not clash with another PostgreSQL on 5432 (e.g. SiteSentry).
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      # Runs once, the first time the database is created.
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U regs -d regs"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  pgdata:

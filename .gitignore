@@ -1,0 +1,17 @@
+# Secrets: never commit
+.env
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Editors / OS
+.vscode/
+.idea/
+Thumbs.db
+.DS_Store
+
+# Regulation PDFs are downloaded with: python -m app.download
+data/pdfs/*.pdf

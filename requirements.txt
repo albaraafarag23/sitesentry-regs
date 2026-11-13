@@ -1,0 +1,23 @@
+# Web API
+fastapi
+uvicorn[standard]
+
+# Database: PostgreSQL driver + pgvector type support
+psycopg[binary]
+pgvector
+
+# PDF text extraction
+pymupdf
+
+# Hugging Face embedding model runner
+sentence-transformers
+
+# LLM that writes the final answer
+anthropic
+
+# Reads settings from the .env file
+python-dotenv
+
+# Tests
+pytest
+httpx
