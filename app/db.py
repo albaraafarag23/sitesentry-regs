@@ -9,7 +9,8 @@ from app.config import DATABASE_URL
 
 
 def connect() -> psycopg.Connection:
-    conn = psycopg.connect(DATABASE_URL, row_factory=dict_row)
+    # connect_timeout: fail after 5 seconds if the database is not running, instead of hanging.
+    conn = psycopg.connect(DATABASE_URL, row_factory=dict_row, connect_timeout=5)
     register_vector(conn)  # teaches psycopg how to send/receive the "vector" type
     return conn
 

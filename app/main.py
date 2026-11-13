@@ -2,11 +2,11 @@
 
 import os
 
-import anthropic
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 
-from app.answer import cited_numbers, generate_answer
+from app.answer import LLMError, cited_numbers, generate_answer
+from app.config import LLM_KEY_NAME
 from app.retrieval import retrieve
 
 app = FastAPI(title="SiteSentry Regs", description="Cited answers about UAE construction-safety regulations.")
@@ -50,9 +50,9 @@ def search(body: Question) -> list[Source]:
 
 @app.post("/ask", response_model=Answer)
 def ask(body: Question) -> Answer:
-    """Retrieve relevant clauses, then have Claude answer from them with citations."""
-    if not os.getenv("ANTHROPIC_API_KEY"):
-        raise HTTPException(503, "ANTHROPIC_API_KEY is not set. Add it to .env, or use /search.")
+    """Retrieve relevant clauses, then have the LLM answer from them with citations."""
+    if not os.getenv(LLM_KEY_NAME):
+        raise HTTPException(503, f"{LLM_KEY_NAME} is not set. Add it to .env, or use /search.")
 
     chunks = retrieve(body.question)
     if not chunks:
@@ -60,12 +60,8 @@ def ask(body: Question) -> Answer:
 
     try:
         text = generate_answer(body.question, chunks)
-    except anthropic.AuthenticationError:
-        raise HTTPException(503, "The Claude API rejected the key in .env.")
-    except anthropic.RateLimitError:
-        raise HTTPException(429, "Claude API rate limit reached. Try again shortly.")
-    except (anthropic.APIError, RuntimeError) as error:
-        raise HTTPException(502, f"Claude API error: {error}")
+    except LLMError as error:
+        raise HTTPException(502, str(error))
 
     sources = to_sources(chunks)
     cited = cited_numbers(text, len(sources))

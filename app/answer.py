@@ -1,4 +1,4 @@
-"""Ask Claude to answer a question using only the retrieved clauses.
+"""Ask an LLM (Gemini or Claude) to answer a question using only the retrieved clauses.
 
 This is the "generation" half of RAG (Retrieval-Augmented Generation):
   1. retrieval found the most relevant clauses (app/retrieval.py)
@@ -10,11 +10,10 @@ Because citations are numbers that point at chunks we retrieved ourselves,
 the model cannot invent a clause number that does not exist.
 """
 
+import os
 import re
 
-import anthropic
-
-from app.config import ANTHROPIC_MODEL
+from app.config import ANTHROPIC_MODEL, GEMINI_MODEL, LLM_PROVIDER
 
 SYSTEM_PROMPT = """You answer questions about UAE construction-safety regulations.
 
@@ -48,25 +47,62 @@ def cited_numbers(answer: str, source_count: int) -> list[int]:
     return seen
 
 
-def generate_answer(question: str, chunks: list[dict]) -> str:
-    """Call Claude with the question and the numbered sources; return its text."""
+def build_prompt(question: str, chunks: list[dict]) -> str:
+    return f"Sources:\n\n{format_sources(chunks)}\n\nQuestion: {question}"
+
+
+class LLMError(Exception):
+    """The LLM provider could not produce an answer."""
+
+
+def _ask_gemini(prompt: str) -> str:
+    from google import genai
+    from google.genai import errors, types
+
+    client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
+    try:
+        response = client.models.generate_content(
+            model=GEMINI_MODEL,
+            contents=prompt,
+            config=types.GenerateContentConfig(system_instruction=SYSTEM_PROMPT),
+        )
+    except errors.APIError as error:
+        raise LLMError(f"Gemini API error {error.code}: {error.message}") from error
+    if not response.text:
+        raise LLMError("Gemini returned no text for this question.")
+    return response.text.strip()
+
+
+def _ask_claude(prompt: str) -> str:
+    import anthropic
+
     client = anthropic.Anthropic()  # reads ANTHROPIC_API_KEY from the environment
-    response = client.beta.messages.create(
-        model=ANTHROPIC_MODEL,
-        max_tokens=16000,
-        output_config={"effort": "medium"},
-        system=SYSTEM_PROMPT,
-        # If the model declines a request, let the API retry it on a fallback model.
-        betas=["server-side-fallback-2026-07-01"],
-        fallbacks="default",
-        messages=[
-            {
-                "role": "user",
-                "content": f"Sources:\n\n{format_sources(chunks)}\n\nQuestion: {question}",
-            }
-        ],
-    )
+    try:
+        response = client.beta.messages.create(
+            model=ANTHROPIC_MODEL,
+            max_tokens=16000,
+            output_config={"effort": "medium"},
+            system=SYSTEM_PROMPT,
+            # If the model declines a request, let the API retry it on a fallback model.
+            betas=["server-side-fallback-2026-07-01"],
+            fallbacks="default",
+            messages=[{"role": "user", "content": prompt}],
+        )
+    except anthropic.APIError as error:
+        raise LLMError(f"Claude API error: {error}") from error
     if response.stop_reason == "refusal":
-        raise RuntimeError("The model declined to answer this question.")
+        raise LLMError("The model declined to answer this question.")
     # The response is a list of blocks (thinking, text, ...). Keep only the text.
     return "".join(block.text for block in response.content if block.type == "text").strip()
+
+
+def generate_answer(question: str, chunks: list[dict]) -> str:
+    """Send the question and the numbered sources to the configured LLM; return its text.
+
+    The prompt is the same for every provider, so switching LLM is one setting
+    (LLM_PROVIDER in .env) and does not touch retrieval or citations.
+    """
+    prompt = build_prompt(question, chunks)
+    if LLM_PROVIDER == "claude":
+        return _ask_claude(prompt)
+    return _ask_gemini(prompt)

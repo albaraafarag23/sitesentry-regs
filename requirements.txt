@@ -12,7 +12,8 @@ pymupdf
 # Hugging Face embedding model runner
 sentence-transformers
 
-# LLM that writes the final answer
+# LLMs that write the final answer (Gemini by default, Claude optional)
+google-genai
 anthropic
 
 # Reads settings from the .env file

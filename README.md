@@ -14,7 +14,7 @@ assistant says which rule it breaks.
 ```
 PDF -> pages -> clauses (chunks) -> embeddings -> PostgreSQL + pgvector      (ingestion, run once)
 
-question -> embedding -> nearest clauses -> Claude writes answer with [n] citations   (every request)
+question -> embedding -> nearest clauses -> LLM writes answer with [n] citations   (every request)
 ```
 
 - **Chunking** (`app/chunking.py`): each PDF is split at its numbered headings, so every
@@ -24,7 +24,7 @@ question -> embedding -> nearest clauses -> Claude writes answer with [n] citati
   an English clause.
 - **Vector search** (`app/db.py`): chunks live in PostgreSQL with the pgvector extension;
   the nearest chunks are found with cosine distance and an HNSW index.
-- **Answering** (`app/answer.py`): Claude gets the retrieved clauses as numbered sources
+- **Answering** (`app/answer.py`): the LLM (Gemini by default, Claude optional) gets the retrieved clauses as numbered sources
   and must cite them. The API maps the numbers back to document, clause and page.
 
 ## Documents
@@ -45,7 +45,7 @@ docker compose up -d                      # PostgreSQL + pgvector on port 5433
 python -m venv .venv
 .venv/Scripts/activate                    # Windows; on Linux/macOS: source .venv/bin/activate
 pip install -r requirements.txt
-cp .env.example .env                      # then put your ANTHROPIC_API_KEY in .env
+cp .env.example .env                      # then put your GEMINI_API_KEY in .env
 python -m app.download                    # fetch the official PDFs into data/pdfs
 python -m app.ingest                      # chunk, embed and store them
 uvicorn app.main:app --reload
