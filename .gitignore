@@ -15,3 +15,9 @@ Thumbs.db
 
 # Regulation PDFs are downloaded with: python -m app.download
 data/pdfs/*.pdf
+.neon
+node_modules/
+
+# Neon writes connection strings here; never commit
+.env.local
+.env*.local
