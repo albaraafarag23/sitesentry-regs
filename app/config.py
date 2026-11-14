@@ -11,7 +11,7 @@ EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "intfloat/multilingual-e5-small")
 
 # Which LLM writes the answer: "gemini" (free tier) or "claude".
 LLM_PROVIDER = os.getenv("LLM_PROVIDER", "gemini").lower()
-GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-flash-latest")
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.5-flash")
 ANTHROPIC_MODEL = os.getenv("ANTHROPIC_MODEL", "claude-opus-5-5")
 # The API key variable each provider needs.
 LLM_KEY_NAME = {"gemini": "GEMINI_API_KEY", "claude": "ANTHROPIC_API_KEY"}.get(LLM_PROVIDER, "GEMINI_API_KEY")

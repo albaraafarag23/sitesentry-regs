@@ -59,7 +59,10 @@ def _ask_gemini(prompt: str) -> str:
     from google import genai
     from google.genai import errors, types
 
-    client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
+    client = genai.Client(
+        api_key=os.environ["GEMINI_API_KEY"],
+        http_options=types.HttpOptions(timeout=60_000),  # milliseconds; fail instead of hanging
+    )
     try:
         response = client.models.generate_content(
             model=GEMINI_MODEL,
