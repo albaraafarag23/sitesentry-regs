@@ -1,0 +1,543 @@
+[
+  {
+    "id": "en-01",
+    "question": "At what angle should a portable ladder be set up?",
+    "group": "en",
+    "expected": [
+      {
+        "document": "OSHJ-CoP-04",
+        "clause": "5.4.1"
+      }
+    ]
+  },
+  {
+    "id": "en-02",
+    "question": "How far above the landing level should a ladder extend?",
+    "group": "en",
+    "expected": [
+      {
+        "document": "OSHJ-CoP-04",
+        "clause": "5.4.1"
+      }
+    ]
+  },
+  {
+    "id": "en-03",
+    "question": "What is the minimum height of the top guard rail?",
+    "group": "en",
+    "expected": [
+      {
+        "document": "OSHJ-CoP-04",
+        "clause": "5.5.3"
+      }
+    ]
+  },
+  {
+    "id": "en-04",
+    "question": "Can edge protection be taken down for a short time, and under what conditions?",
+    "group": "en",
+    "expected": [
+      {
+        "document": "OSHJ-CoP-04",
+        "clause": "5.5.3"
+      }
+    ]
+  },
+  {
+    "id": "en-05",
+    "question": "What precautions are needed before working on a fragile roof or near skylights?",
+    "group": "en",
+    "expected": [
+      {
+        "document": "OSHJ-CoP-04",
+        "clause": "5.5.2"
+      }
+    ]
+  },
+  {
+    "id": "en-06",
+    "question": "How do we stop tools and materials dropping onto people below?",
+    "group": "en",
+    "expected": [
+      {
+        "document": "OSHJ-CoP-04",
+        "clause": "5.5.1"
+      }
+    ]
+  },
+  {
+    "id": "en-07",
+    "question": "When are safety nets or airbags allowed as fall protection?",
+    "group": "en",
+    "expected": [
+      {
+        "document": "OSHJ-CoP-04",
+        "clause": "5.5.4"
+      }
+    ]
+  },
+  {
+    "id": "en-08",
+    "question": "What is the difference between a fall restraint system and a fall arrest system?",
+    "group": "en",
+    "expected": [
+      {
+        "document": "OSHJ-CoP-04",
+        "clause": "5.5.5"
+      },
+      {
+        "document": "OSHJ-CoP-04",
+        "clause": "5.5.5.1"
+      },
+      {
+        "document": "OSHJ-CoP-04",
+        "clause": "5.5.5.2"
+      }
+    ]
+  },
+  {
+    "id": "en-09",
+    "question": "How often must work at height equipment be inspected?",
+    "group": "en",
+    "expected": [
+      {
+        "document": "OSHJ-CoP-04",
+        "clause": "5.6"
+      }
+    ]
+  },
+  {
+    "id": "en-10",
+    "question": "What has to be documented before rope access work starts?",
+    "group": "en",
+    "expected": [
+      {
+        "document": "OSHJ-CoP-04",
+        "clause": "5.4.3"
+      }
+    ]
+  },
+  {
+    "id": "en-11",
+    "question": "What is the hierarchy of control for managing work at height?",
+    "group": "en",
+    "expected": [
+      {
+        "document": "OSHJ-CoP-04",
+        "clause": "5.2"
+      }
+    ]
+  },
+  {
+    "id": "en-12",
+    "question": "What duties do employees have when they work at height?",
+    "group": "en",
+    "expected": [
+      {
+        "document": "OSHJ-CoP-04",
+        "clause": "4.2"
+      }
+    ]
+  },
+  {
+    "id": "en-13",
+    "question": "Who needs working at height training, and when is refresher training required?",
+    "group": "en",
+    "expected": [
+      {
+        "document": "OSHJ-CoP-04",
+        "clause": "6"
+      }
+    ]
+  },
+  {
+    "id": "en-14",
+    "question": "What emergency and rescue arrangements are needed for work at height?",
+    "group": "en",
+    "expected": [
+      {
+        "document": "OSHJ-CoP-04",
+        "clause": "7"
+      },
+      {
+        "document": "OSHJ-CoP-04",
+        "clause": "5.1"
+      }
+    ]
+  },
+  {
+    "id": "en-15",
+    "question": "What is suspension trauma?",
+    "group": "en",
+    "expected": [
+      {
+        "document": "OSHJ-CoP-04",
+        "clause": "3"
+      }
+    ]
+  },
+  {
+    "id": "en-16",
+    "question": "What are the rules for using a stepladder?",
+    "group": "en",
+    "expected": [
+      {
+        "document": "OSHJ-CoP-04",
+        "clause": "5.4.2"
+      }
+    ]
+  },
+  {
+    "id": "en-17",
+    "question": "A worker is on a roof edge and is not wearing a safety harness. Which requirement applies?",
+    "group": "en",
+    "expected": [
+      {
+        "document": "OSHJ-CoP-04",
+        "clause": "5.5.5"
+      },
+      {
+        "document": "OSHJ-CoP-04",
+        "clause": "5.5.5.1"
+      },
+      {
+        "document": "OSHJ-CoP-04",
+        "clause": "5.5.5.2"
+      },
+      {
+        "document": "OSHJ-CoP-04",
+        "clause": "5.5.3"
+      }
+    ]
+  },
+  {
+    "id": "en-18",
+    "question": "What should be considered when choosing equipment for a job at height?",
+    "group": "en",
+    "expected": [
+      {
+        "document": "OSHJ-CoP-04",
+        "clause": "5.3"
+      }
+    ]
+  },
+  {
+    "id": "en-19",
+    "question": "Who is responsible for preparing the construction safety and health plan?",
+    "group": "en",
+    "expected": [
+      {
+        "document": "OSHJ-CoP-02",
+        "clause": "4.2"
+      },
+      {
+        "document": "OSHJ-CoP-02",
+        "clause": "4.3"
+      },
+      {
+        "document": "OSHJ-CoP-02",
+        "clause": "5.1"
+      }
+    ]
+  },
+  {
+    "id": "en-20",
+    "question": "What should a site induction cover for people new to the site?",
+    "group": "en",
+    "expected": [
+      {
+        "document": "OSHJ-CoP-02",
+        "clause": "5.8"
+      }
+    ]
+  },
+  {
+    "id": "en-21",
+    "question": "How should a construction site be secured against unauthorised entry?",
+    "group": "en",
+    "expected": [
+      {
+        "document": "OSHJ-CoP-02",
+        "clause": "5.9"
+      }
+    ]
+  },
+  {
+    "id": "en-22",
+    "question": "In which languages must the site rules be written?",
+    "group": "en",
+    "expected": [
+      {
+        "document": "OSHJ-CoP-02",
+        "clause": "5.7"
+      }
+    ]
+  },
+  {
+    "id": "en-23",
+    "question": "What is a permit to work and who sets up the system?",
+    "group": "en",
+    "expected": [
+      {
+        "document": "OSHJ-CoP-02",
+        "clause": "5.5"
+      }
+    ]
+  },
+  {
+    "id": "en-24",
+    "question": "What has to be arranged before demolition work begins?",
+    "group": "en",
+    "expected": [
+      {
+        "document": "OSHJ-CoP-02",
+        "clause": "5.11"
+      }
+    ]
+  },
+  {
+    "id": "en-25",
+    "question": "How quickly must an incident be reported?",
+    "group": "en",
+    "expected": [
+      {
+        "document": "OSHJ-CoP-02",
+        "clause": "5.12"
+      }
+    ]
+  },
+  {
+    "id": "en-26",
+    "question": "What fire precautions are needed on a construction site?",
+    "group": "en",
+    "expected": [
+      {
+        "document": "OSHJ-CoP-02",
+        "clause": "7.1"
+      }
+    ]
+  },
+  {
+    "id": "en-27",
+    "question": "What are the duties of the client on a construction project?",
+    "group": "en",
+    "expected": [
+      {
+        "document": "OSHJ-CoP-02",
+        "clause": "4.1"
+      }
+    ]
+  },
+  {
+    "id": "en-28",
+    "question": "What does a safety method statement describe?",
+    "group": "en",
+    "expected": [
+      {
+        "document": "OSHJ-CoP-02",
+        "clause": "5.4"
+      }
+    ]
+  },
+  {
+    "id": "en-29",
+    "question": "What first aid provision is required on site?",
+    "group": "en",
+    "expected": [
+      {
+        "document": "OSHJ-CoP-02",
+        "clause": "7.2"
+      }
+    ]
+  },
+  {
+    "id": "ar-01",
+    "question": "ما هي الزاوية الصحيحة لوضع السلم المحمول؟",
+    "group": "ar",
+    "expected": [
+      {
+        "document": "OSHJ-CoP-04",
+        "clause": "5.4.1"
+      }
+    ]
+  },
+  {
+    "id": "ar-02",
+    "question": "ما الحد الأدنى لارتفاع درابزين الحماية؟",
+    "group": "ar",
+    "expected": [
+      {
+        "document": "OSHJ-CoP-04",
+        "clause": "5.5.3"
+      }
+    ]
+  },
+  {
+    "id": "ar-03",
+    "question": "متى يجب فحص معدات العمل في الأماكن المرتفعة؟",
+    "group": "ar",
+    "expected": [
+      {
+        "document": "OSHJ-CoP-04",
+        "clause": "5.6"
+      }
+    ]
+  },
+  {
+    "id": "ar-04",
+    "question": "ما هي التزامات العامل عند العمل في الأماكن المرتفعة؟",
+    "group": "ar",
+    "expected": [
+      {
+        "document": "OSHJ-CoP-04",
+        "clause": "4.2"
+      }
+    ]
+  },
+  {
+    "id": "ar-05",
+    "question": "كيف نحمي الأشخاص من سقوط الأدوات والمواد من الأعلى؟",
+    "group": "ar",
+    "expected": [
+      {
+        "document": "OSHJ-CoP-04",
+        "clause": "5.5.1"
+      }
+    ]
+  },
+  {
+    "id": "ar-06",
+    "question": "ما الاحتياطات المطلوبة عند العمل على الأسطح الهشة؟",
+    "group": "ar",
+    "expected": [
+      {
+        "document": "OSHJ-CoP-04",
+        "clause": "5.5.2"
+      }
+    ]
+  },
+  {
+    "id": "ar-07",
+    "question": "من يجب تدريبه على العمل في الأماكن المرتفعة؟",
+    "group": "ar",
+    "expected": [
+      {
+        "document": "OSHJ-CoP-04",
+        "clause": "6"
+      }
+    ]
+  },
+  {
+    "id": "ar-08",
+    "question": "ما الفرق بين نظام منع السقوط ونظام إيقاف السقوط؟",
+    "group": "ar",
+    "expected": [
+      {
+        "document": "OSHJ-CoP-04",
+        "clause": "5.5.5"
+      },
+      {
+        "document": "OSHJ-CoP-04",
+        "clause": "5.5.5.1"
+      },
+      {
+        "document": "OSHJ-CoP-04",
+        "clause": "5.5.5.2"
+      }
+    ]
+  },
+  {
+    "id": "ar-09",
+    "question": "ما المقصود بالعمل في الأماكن المرتفعة؟",
+    "group": "ar",
+    "expected": [
+      {
+        "document": "OSHJ-CoP-04",
+        "clause": "1"
+      },
+      {
+        "document": "OSHJ-CoP-04",
+        "clause": "3"
+      }
+    ]
+  },
+  {
+    "id": "ar-10",
+    "question": "ما هي قواعد استخدام السلم ذي الدرج؟",
+    "group": "ar",
+    "expected": [
+      {
+        "document": "OSHJ-CoP-04",
+        "clause": "5.4.2"
+      }
+    ]
+  },
+  {
+    "id": "x-01",
+    "question": "ما الذي يجب أن يتضمنه التعريف بالموقع للعمال الجدد؟",
+    "group": "ar-to-en",
+    "expected": [
+      {
+        "document": "OSHJ-CoP-02",
+        "clause": "5.8"
+      }
+    ]
+  },
+  {
+    "id": "x-02",
+    "question": "كيف يجب تأمين موقع البناء لمنع دخول الأشخاص غير المصرح لهم؟",
+    "group": "ar-to-en",
+    "expected": [
+      {
+        "document": "OSHJ-CoP-02",
+        "clause": "5.9"
+      }
+    ]
+  },
+  {
+    "id": "x-03",
+    "question": "ما هي الإجراءات المطلوبة قبل البدء في أعمال الهدم؟",
+    "group": "ar-to-en",
+    "expected": [
+      {
+        "document": "OSHJ-CoP-02",
+        "clause": "5.11"
+      }
+    ]
+  },
+  {
+    "id": "x-04",
+    "question": "ما هي احتياطات الحريق المطلوبة في موقع البناء؟",
+    "group": "ar-to-en",
+    "expected": [
+      {
+        "document": "OSHJ-CoP-02",
+        "clause": "7.1"
+      }
+    ]
+  },
+  {
+    "id": "no-01",
+    "question": "What is the speed limit for forklifts in a warehouse?",
+    "group": "unanswerable",
+    "expected": []
+  },
+  {
+    "id": "no-02",
+    "question": "What is the maximum noise exposure limit in decibels?",
+    "group": "unanswerable",
+    "expected": []
+  },
+  {
+    "id": "no-03",
+    "question": "What is the minimum wage for construction workers in the UAE?",
+    "group": "unanswerable",
+    "expected": []
+  },
+  {
+    "id": "no-04",
+    "question": "ما هي درجة الحرارة التي يجب إيقاف العمل عندها في الصيف؟",
+    "group": "unanswerable",
+    "expected": []
+  }
+]

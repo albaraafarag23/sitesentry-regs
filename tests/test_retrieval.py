@@ -17,11 +17,19 @@ def clauses(results: list[dict]) -> list[tuple[str, str]]:
     return [(r["document"], r["clause"]) for r in results]
 
 
-def test_returns_top_k_results_best_first():
-    results = retrieve("ladder inspection", top_k=3)
-    assert len(results) == 3
-    similarities = [r["similarity"] for r in results]
-    assert similarities == sorted(similarities, reverse=True)
+def test_returns_top_k_results_best_first_within_each_language():
+    results = retrieve("ladder inspection", top_k=6)
+    assert len(results) == 6
+    for language in ("en", "ar"):
+        similarities = [r["similarity"] for r in results if r["language"] == language]
+        assert similarities, f"no {language} results"
+        assert similarities == sorted(similarities, reverse=True)
+
+
+def test_arabic_question_reaches_a_document_that_exists_only_in_english():
+    # "How should the construction site be secured to prevent unauthorised entry?"
+    results = retrieve("كيف يجب تأمين موقع البناء لمنع دخول الأشخاص غير المصرح لهم؟", top_k=8)
+    assert ("OSHJ-CoP-02", "5.9") in clauses(results)
 
 
 def test_english_question_finds_the_ladder_clause():

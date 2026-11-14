@@ -1,0 +1,508 @@
+{
+  "retrieval": {
+    "all": {
+      "hit@1": 0.8372093023255814,
+      "hit@3": 0.9534883720930233,
+      "hit@5": 0.9534883720930233,
+      "hit@8": 0.9767441860465116,
+      "mrr": 0.898671096345515,
+      "questions": 43
+    },
+    "en": {
+      "hit@1": 0.9655172413793104,
+      "hit@3": 0.9655172413793104,
+      "hit@5": 0.9655172413793104,
+      "hit@8": 1.0,
+      "mrr": 0.9704433497536946,
+      "questions": 29
+    },
+    "ar": {
+      "hit@1": 0.8,
+      "hit@3": 1.0,
+      "hit@5": 1.0,
+      "hit@8": 1.0,
+      "mrr": 0.9,
+      "questions": 10
+    },
+    "ar-to-en": {
+      "hit@1": 0.0,
+      "hit@3": 0.75,
+      "hit@5": 0.75,
+      "hit@8": 0.75,
+      "mrr": 0.375,
+      "questions": 4
+    }
+  },
+  "details": [
+    {
+      "id": "en-01",
+      "group": "en",
+      "rank": 1,
+      "top": [
+        "OSHJ-CoP-04 5.4.1 (en)",
+        "OSHJ-CoP-04 5.4.2 (ar)",
+        "OSHJ-CoP-04 5.4.1 (en)"
+      ]
+    },
+    {
+      "id": "en-02",
+      "group": "en",
+      "rank": 1,
+      "top": [
+        "OSHJ-CoP-04 5.4.1 (en)",
+        "OSHJ-CoP-04 5.4.2 (ar)",
+        "OSHJ-CoP-04 5.4.1 (en)"
+      ]
+    },
+    {
+      "id": "en-03",
+      "group": "en",
+      "rank": 1,
+      "top": [
+        "OSHJ-CoP-04 5.5.3 (en)",
+        "OSHJ-CoP-04 5.5.3 (ar)",
+        "OSHJ-CoP-04 5.5.3 (en)"
+      ]
+    },
+    {
+      "id": "en-04",
+      "group": "en",
+      "rank": 1,
+      "top": [
+        "OSHJ-CoP-04 5.5.3 (en)",
+        "OSHJ-CoP-04 5.5.3 (ar)",
+        "OSHJ-CoP-04 5.5.1 (en)"
+      ]
+    },
+    {
+      "id": "en-05",
+      "group": "en",
+      "rank": 1,
+      "top": [
+        "OSHJ-CoP-04 5.5.2 (en)",
+        "OSHJ-CoP-04 5.5.2 (ar)",
+        "OSHJ-CoP-04 5.4.3 (en)"
+      ]
+    },
+    {
+      "id": "en-06",
+      "group": "en",
+      "rank": 1,
+      "top": [
+        "OSHJ-CoP-04 5.5.1 (en)",
+        "OSHJ-CoP-04 5.5.1 (ar)",
+        "OSHJ-CoP-04 5.5.4 (en)"
+      ]
+    },
+    {
+      "id": "en-07",
+      "group": "en",
+      "rank": 1,
+      "top": [
+        "OSHJ-CoP-04 5.5.4 (en)",
+        "OSHJ-CoP-04 5.5.5 (ar)",
+        "OSHJ-CoP-04 5.5.1 (en)"
+      ]
+    },
+    {
+      "id": "en-08",
+      "group": "en",
+      "rank": 1,
+      "top": [
+        "OSHJ-CoP-04 5.5.5.2 (en)",
+        "OSHJ-CoP-04 5.5.5 (ar)",
+        "OSHJ-CoP-04 5.5.5 (en)"
+      ]
+    },
+    {
+      "id": "en-09",
+      "group": "en",
+      "rank": 1,
+      "top": [
+        "OSHJ-CoP-04 5.6 (en)",
+        "OSHJ-CoP-04 5.6 (ar)",
+        "OSHJ-CoP-04 5.3 (en)"
+      ]
+    },
+    {
+      "id": "en-10",
+      "group": "en",
+      "rank": 1,
+      "top": [
+        "OSHJ-CoP-04 5.4.3 (en)",
+        "OSHJ-CoP-04 5.4.3 (ar)",
+        "OSHJ-CoP-04 5.4.3 (en)"
+      ]
+    },
+    {
+      "id": "en-11",
+      "group": "en",
+      "rank": 1,
+      "top": [
+        "OSHJ-CoP-04 5.2 (en)",
+        "OSHJ-CoP-04 5.2 (ar)",
+        "OSHJ-CoP-04 5 (en)"
+      ]
+    },
+    {
+      "id": "en-12",
+      "group": "en",
+      "rank": 1,
+      "top": [
+        "OSHJ-CoP-04 4.2 (en)",
+        "OSHJ-CoP-04 4.1 (ar)",
+        "OSHJ-CoP-04 5 (en)"
+      ]
+    },
+    {
+      "id": "en-13",
+      "group": "en",
+      "rank": 1,
+      "top": [
+        "OSHJ-CoP-04 6 (en)",
+        "OSHJ-CoP-04 5.3 (ar)",
+        "OSHJ-CoP-04 5 (en)"
+      ]
+    },
+    {
+      "id": "en-14",
+      "group": "en",
+      "rank": 1,
+      "top": [
+        "OSHJ-CoP-04 7 (en)",
+        "OSHJ-CoP-04 5.3 (ar)",
+        "OSHJ-CoP-04 4.1 (en)"
+      ]
+    },
+    {
+      "id": "en-15",
+      "group": "en",
+      "rank": 1,
+      "top": [
+        "OSHJ-CoP-04 3 (en)",
+        "OSHJ-CoP-04 5.5.1 (ar)",
+        "OSHJ-CoP-04 5.5.1 (en)"
+      ]
+    },
+    {
+      "id": "en-16",
+      "group": "en",
+      "rank": 1,
+      "top": [
+        "OSHJ-CoP-04 5.4.2 (en)",
+        "OSHJ-CoP-04 5.4.2 (ar)",
+        "OSHJ-CoP-04 5.4.1 (en)"
+      ]
+    },
+    {
+      "id": "en-17",
+      "group": "en",
+      "rank": 7,
+      "top": [
+        "OSHJ-CoP-04 5.4.3 (en)",
+        "OSHJ-CoP-04 5.4.3 (ar)",
+        "OSHJ-CoP-04 5.4.3 (en)"
+      ]
+    },
+    {
+      "id": "en-18",
+      "group": "en",
+      "rank": 1,
+      "top": [
+        "OSHJ-CoP-04 5.3 (en)",
+        "OSHJ-CoP-04 5.3 (ar)",
+        "OSHJ-CoP-04 5.3 (en)"
+      ]
+    },
+    {
+      "id": "en-19",
+      "group": "en",
+      "rank": 1,
+      "top": [
+        "OSHJ-CoP-02 5.1 (en)",
+        "OSHJ-CoP-04 5.1 (ar)",
+        "OSHJ-CoP-02 4.2 (en)"
+      ]
+    },
+    {
+      "id": "en-20",
+      "group": "en",
+      "rank": 1,
+      "top": [
+        "OSHJ-CoP-02 5.8 (en)",
+        "OSHJ-CoP-04 5.4.3 (ar)",
+        "OSHJ-CoP-02 5.6 (en)"
+      ]
+    },
+    {
+      "id": "en-21",
+      "group": "en",
+      "rank": 1,
+      "top": [
+        "OSHJ-CoP-02 5.9 (en)",
+        "OSHJ-CoP-04 5.5.3 (ar)",
+        "OSHJ-CoP-02 1 (en)"
+      ]
+    },
+    {
+      "id": "en-22",
+      "group": "en",
+      "rank": 1,
+      "top": [
+        "OSHJ-CoP-02 5.7 (en)",
+        "OSHJ-CoP-04 6 (ar)",
+        "OSHJ-CoP-02 5.8 (en)"
+      ]
+    },
+    {
+      "id": "en-23",
+      "group": "en",
+      "rank": 1,
+      "top": [
+        "OSHJ-CoP-02 5.5 (en)",
+        "OSHJ-CoP-04 6 (ar)",
+        "OSHJ-CoP-02 5.9 (en)"
+      ]
+    },
+    {
+      "id": "en-24",
+      "group": "en",
+      "rank": 1,
+      "top": [
+        "OSHJ-CoP-02 5.11 (en)",
+        "OSHJ-CoP-04 5.1 (ar)",
+        "OSHJ-CoP-02 5.11 (en)"
+      ]
+    },
+    {
+      "id": "en-25",
+      "group": "en",
+      "rank": 1,
+      "top": [
+        "OSHJ-CoP-02 5.12 (en)",
+        "OSHJ-CoP-04 7 (ar)",
+        "OSHJ-CoP-02 5.12 (en)"
+      ]
+    },
+    {
+      "id": "en-26",
+      "group": "en",
+      "rank": 1,
+      "top": [
+        "OSHJ-CoP-02 7.1 (en)",
+        "OSHJ-CoP-04 5.5.3 (ar)",
+        "OSHJ-CoP-02 7.1 (en)"
+      ]
+    },
+    {
+      "id": "en-27",
+      "group": "en",
+      "rank": 1,
+      "top": [
+        "OSHJ-CoP-02 4.1 (en)",
+        "OSHJ-CoP-04 5.1 (ar)",
+        "OSHJ-CoP-02 4.2 (en)"
+      ]
+    },
+    {
+      "id": "en-28",
+      "group": "en",
+      "rank": 1,
+      "top": [
+        "OSHJ-CoP-02 5.4 (en)",
+        "OSHJ-CoP-04 5.5.5 (ar)",
+        "OSHJ-CoP-02 5.4 (en)"
+      ]
+    },
+    {
+      "id": "en-29",
+      "group": "en",
+      "rank": 1,
+      "top": [
+        "OSHJ-CoP-02 7.2 (en)",
+        "OSHJ-CoP-04 5.5.5 (ar)",
+        "OSHJ-CoP-02 5.8 (en)"
+      ]
+    },
+    {
+      "id": "ar-01",
+      "group": "ar",
+      "rank": 1,
+      "top": [
+        "OSHJ-CoP-04 5.4.1 (ar)",
+        "OSHJ-CoP-04 5.3 (en)",
+        "OSHJ-CoP-04 5.4.2 (ar)"
+      ]
+    },
+    {
+      "id": "ar-02",
+      "group": "ar",
+      "rank": 1,
+      "top": [
+        "OSHJ-CoP-04 5.5.3 (ar)",
+        "OSHJ-CoP-02 5.13 (en)",
+        "OSHJ-CoP-04 5.5.3 (ar)"
+      ]
+    },
+    {
+      "id": "ar-03",
+      "group": "ar",
+      "rank": 1,
+      "top": [
+        "OSHJ-CoP-04 5.6 (ar)",
+        "OSHJ-CoP-04 5.6 (en)",
+        "OSHJ-CoP-04 5 (ar)"
+      ]
+    },
+    {
+      "id": "ar-04",
+      "group": "ar",
+      "rank": 1,
+      "top": [
+        "OSHJ-CoP-04 4.2 (ar)",
+        "OSHJ-CoP-04 1 (en)",
+        "OSHJ-CoP-04 4.1 (ar)"
+      ]
+    },
+    {
+      "id": "ar-05",
+      "group": "ar",
+      "rank": 1,
+      "top": [
+        "OSHJ-CoP-04 5.5.1 (ar)",
+        "OSHJ-CoP-04 5.5.1 (en)",
+        "OSHJ-CoP-04 4.1 (ar)"
+      ]
+    },
+    {
+      "id": "ar-06",
+      "group": "ar",
+      "rank": 1,
+      "top": [
+        "OSHJ-CoP-04 5.5.2 (ar)",
+        "OSHJ-CoP-04 5.3 (en)",
+        "OSHJ-CoP-04 5.3 (ar)"
+      ]
+    },
+    {
+      "id": "ar-07",
+      "group": "ar",
+      "rank": 2,
+      "top": [
+        "OSHJ-CoP-04 5 (ar)",
+        "OSHJ-CoP-04 6 (en)",
+        "OSHJ-CoP-04 4.1 (ar)"
+      ]
+    },
+    {
+      "id": "ar-08",
+      "group": "ar",
+      "rank": 1,
+      "top": [
+        "OSHJ-CoP-04 5.5.5 (ar)",
+        "OSHJ-CoP-04 5.5.5.2 (en)",
+        "OSHJ-CoP-04 5.5.5 (ar)"
+      ]
+    },
+    {
+      "id": "ar-09",
+      "group": "ar",
+      "rank": 2,
+      "top": [
+        "OSHJ-CoP-04 4.1 (ar)",
+        "OSHJ-CoP-04 1 (en)",
+        "OSHJ-CoP-04 1 (ar)"
+      ]
+    },
+    {
+      "id": "ar-10",
+      "group": "ar",
+      "rank": 1,
+      "top": [
+        "OSHJ-CoP-04 5.4.2 (ar)",
+        "OSHJ-CoP-04 5.4.1 (en)",
+        "OSHJ-CoP-04 5.4.1 (ar)"
+      ]
+    },
+    {
+      "id": "x-01",
+      "group": "ar-to-en",
+      "rank": null,
+      "top": [
+        "OSHJ-CoP-04 9 (ar)",
+        "OSHJ-CoP-04 5.3 (en)",
+        "OSHJ-CoP-04 5.3 (ar)"
+      ]
+    },
+    {
+      "id": "x-02",
+      "group": "ar-to-en",
+      "rank": 2,
+      "top": [
+        "OSHJ-CoP-04 5.3 (ar)",
+        "OSHJ-CoP-02 5.9 (en)",
+        "OSHJ-CoP-04 5.5.3 (ar)"
+      ]
+    },
+    {
+      "id": "x-03",
+      "group": "ar-to-en",
+      "rank": 2,
+      "top": [
+        "OSHJ-CoP-04 5.1 (ar)",
+        "OSHJ-CoP-02 5.11 (en)",
+        "OSHJ-CoP-04 4.1 (ar)"
+      ]
+    },
+    {
+      "id": "x-04",
+      "group": "ar-to-en",
+      "rank": 2,
+      "top": [
+        "OSHJ-CoP-04 5.5.6 (ar)",
+        "OSHJ-CoP-02 7.1 (en)",
+        "OSHJ-CoP-04 5.5.1 (ar)"
+      ]
+    },
+    {
+      "id": "no-01",
+      "group": "unanswerable",
+      "rank": null,
+      "top": [
+        "OSHJ-CoP-04 5.4.1 (en)",
+        "OSHJ-CoP-04 5.5.3 (ar)",
+        "OSHJ-CoP-04 5.3 (en)"
+      ]
+    },
+    {
+      "id": "no-02",
+      "group": "unanswerable",
+      "rank": null,
+      "top": [
+        "OSHJ-CoP-02 5.13 (en)",
+        "OSHJ-CoP-04 5.5.3 (ar)",
+        "OSHJ-CoP-04 5.4.1 (en)"
+      ]
+    },
+    {
+      "id": "no-03",
+      "group": "unanswerable",
+      "rank": null,
+      "top": [
+        "OSHJ-CoP-02 3 (en)",
+        "OSHJ-CoP-04 4.1 (ar)",
+        "OSHJ-CoP-04 6 (en)"
+      ]
+    },
+    {
+      "id": "no-04",
+      "group": "unanswerable",
+      "rank": null,
+      "top": [
+        "OSHJ-CoP-04 4.1 (ar)",
+        "OSHJ-CoP-02 7.1 (en)",
+        "OSHJ-CoP-04 4.2 (ar)"
+      ]
+    }
+  ]
+}

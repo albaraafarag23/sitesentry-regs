@@ -17,7 +17,7 @@ ANTHROPIC_MODEL = os.getenv("ANTHROPIC_MODEL", "claude-opus-5-5")
 LLM_KEY_NAME = {"gemini": "GEMINI_API_KEY", "claude": "ANTHROPIC_API_KEY"}.get(LLM_PROVIDER, "GEMINI_API_KEY")
 
 # How many chunks to retrieve for each question.
-TOP_K = int(os.getenv("TOP_K", "5"))
+TOP_K = int(os.getenv("TOP_K", "8"))
 
 # How many earlier messages of a conversation the agent sees (its "memory window").
 HISTORY_LIMIT = int(os.getenv("HISTORY_LIMIT", "10"))

@@ -47,6 +47,7 @@ def ingest_document(conn, entry: dict) -> int:
 
 def main() -> None:
     entries = json.loads((DATA_DIR / "documents.json").read_text(encoding="utf-8"))
+    db.ensure_schema()
     with db.connect() as conn:
         for entry in entries:
             count = ingest_document(conn, entry)

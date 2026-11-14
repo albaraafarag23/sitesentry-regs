@@ -11,13 +11,24 @@ services:
       - "5433:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
-      # Runs once, the first time the database is created.
-      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U regs -d regs"]
       interval: 5s
       timeout: 3s
       retries: 10
+
+  # The API in a container. Not started by default; use: docker compose --profile full up
+  api:
+    profiles: ["full"]
+    build: .
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://regs:regs@db:5432/regs   # inside Compose the host is "db"
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
 
 volumes:
   pgdata:

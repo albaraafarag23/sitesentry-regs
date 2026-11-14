@@ -10,9 +10,29 @@ from app.config import DATABASE_URL
 # Columns returned for a chunk everywhere (everything except the embedding itself).
 CHUNK_COLUMNS = "id, document, doc_title, language, clause, heading, page, content"
 
-# Created at start-up if missing. (db/init.sql only runs the first time the
-# database volume is created, so newer tables are created here instead.)
+# The whole schema. Every statement is "IF NOT EXISTS", so it is safe to run at every start-up
+# and works the same in Docker Compose, in CI and on a cloud database.
 SCHEMA = """
+-- pgvector adds the "vector" column type and the distance operators.
+CREATE EXTENSION IF NOT EXISTS vector;
+
+-- One row = one chunk of a regulation, with its clause number and its embedding.
+CREATE TABLE IF NOT EXISTS chunks (
+    id          BIGSERIAL PRIMARY KEY,
+    document    TEXT NOT NULL,          -- e.g. "OSHJ-CoP-04"
+    doc_title   TEXT NOT NULL,
+    language    TEXT NOT NULL,          -- "en" or "ar"
+    clause      TEXT NOT NULL,          -- e.g. "5.4.1"
+    heading     TEXT NOT NULL,
+    page        INT  NOT NULL,          -- page where the clause starts
+    content     TEXT NOT NULL,
+    embedding   vector(384) NOT NULL    -- 384 = output size of multilingual-e5-small
+);
+-- HNSW index: finds nearest vectors fast without comparing against every row.
+-- vector_cosine_ops = built for cosine distance (the <=> operator).
+CREATE INDEX IF NOT EXISTS chunks_embedding_idx ON chunks USING hnsw (embedding vector_cosine_ops);
+
+-- Chat memory: one row per message of a conversation.
 CREATE TABLE IF NOT EXISTS messages (
     id          BIGSERIAL PRIMARY KEY,
     session_id  TEXT NOT NULL,          -- one conversation
@@ -32,7 +52,9 @@ def connect() -> psycopg.Connection:
 
 
 def ensure_schema() -> None:
-    with connect() as conn:
+    """Create the extension and tables if they do not exist yet."""
+    # A plain connection: register_vector() needs the extension, which may not exist yet.
+    with psycopg.connect(DATABASE_URL, connect_timeout=5) as conn:
         conn.execute(SCHEMA)
 
 

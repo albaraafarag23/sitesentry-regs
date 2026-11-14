@@ -70,7 +70,8 @@ def gemini_generate(client, **request):
         try:
             return client.models.generate_content(**request)
         except errors.APIError as error:
-            if error.code != 429 or attempt == RATE_LIMIT_RETRIES:
+            daily_limit = "per day" in str(error.message)   # waiting a minute will not help
+            if error.code != 429 or daily_limit or attempt == RATE_LIMIT_RETRIES:
                 raise LLMError(f"Gemini API error {error.code}: {error.message}") from error
             wait = re.search(r"retry in ([\d.]+)(ms|s)", str(error.message))
             seconds = float(wait.group(1)) / (1000 if wait.group(2) == "ms" else 1) if wait else 10

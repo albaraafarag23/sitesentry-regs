@@ -3,6 +3,7 @@
 from app.answer import cited_numbers
 from app.chunking import chunk_document, clean_pages, follows, parse_clause_number, split_long
 from app.pdf_text import detect_language, fix_arabic
+from app.tools import interleave
 
 HEADER = "Working at Height Safety\nPage {n} of 3\nOSHJ-CoP-04\n"
 
@@ -87,3 +88,16 @@ def test_language_detection():
 
 def test_cited_numbers_are_unique_in_order_and_in_range():
     assert cited_numbers("Use a harness [2]. Inspect it [1][2]. See [9].", source_count=3) == [2, 1]
+
+
+def test_interleave_takes_turns_between_languages_best_list_first():
+    english = [{"id": 1, "similarity": 0.80}, {"id": 2, "similarity": 0.79}]
+    arabic = [{"id": 3, "similarity": 0.90}, {"id": 4, "similarity": 0.89}, {"id": 5, "similarity": 0.88}]
+    merged = interleave([english, arabic], top_k=4)
+    assert [r["id"] for r in merged] == [3, 1, 4, 2]
+
+
+def test_interleave_handles_an_empty_language():
+    only = [{"id": 1, "similarity": 0.8}]
+    assert interleave([[], only], top_k=5) == only
+    assert interleave([[], []], top_k=5) == []
