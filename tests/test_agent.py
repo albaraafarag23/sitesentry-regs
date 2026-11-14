@@ -2,7 +2,7 @@
 the tool functions are replaced with fakes."""
 
 from app import agent
-from app.agent import SourceRegistry, run_tool, with_explicit_citations
+from app.agent import SourceRegistry, for_memory, run_tool
 
 LADDERS = {"id": 11, "document": "OSHJ-CoP-04", "doc_title": "Working at Height Safety", "language": "en",
            "clause": "5.4.1", "heading": "Ladders", "page": 7, "content": "Ladders shall be secured."}
@@ -46,12 +46,33 @@ def test_run_tool_rejects_unknown_tool_and_bad_arguments():
     assert "error" in run_tool("get_clause", {"nonsense": 1}, SourceRegistry())
 
 
-def test_citations_are_written_out_before_saving_to_memory():
-    answer = "Secure the ladder [1]. Rails must be 950 mm [2]. Unknown [7]."
-    assert with_explicit_citations(answer, [LADDERS, RAILS]) == (
-        "Secure the ladder (OSHJ-CoP-04 clause 5.4.1). "
-        "Rails must be 950 mm (OSHJ-CoP-04 clause 5.5.3). Unknown [7]."
+def test_answer_saved_to_memory_has_no_numbers_but_lists_its_clauses():
+    answer = "Secure the ladder [1]. Rails must be 950 mm [2][1]."
+    assert for_memory(answer, [LADDERS, RAILS], cited=[1, 2]) == (
+        "Secure the ladder. Rails must be 950 mm.\n\n"
+        "(Sources used in this answer: OSHJ-CoP-04 clause 5.4.1; OSHJ-CoP-04 clause 5.5.3)"
     )
+
+
+def test_answer_without_citations_is_saved_as_plain_text():
+    assert for_memory("The documents do not cover this.", [LADDERS], cited=[]) == "The documents do not cover this."
+
+
+def test_langchain_message_text_handles_strings_and_blocks():
+    from types import SimpleNamespace
+
+    from app.agent_langchain import message_text
+
+    assert message_text(SimpleNamespace(content="plain")) == "plain"
+    blocks = [{"type": "text", "text": "Use a "}, {"type": "thinking", "thinking": "..."}, {"type": "text", "text": "harness [1]."}]
+    assert message_text(SimpleNamespace(content=blocks)) == "Use a harness [1]."
+
+
+def test_langchain_tools_match_the_native_tools():
+    from app.agent_langchain import build_tools
+
+    names = {t.name for t in build_tools(SourceRegistry(), [])}
+    assert names == set(agent.TOOL_FUNCTIONS)
 
 
 def test_every_declared_tool_has_a_function():

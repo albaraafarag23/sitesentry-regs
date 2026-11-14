@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SiteSentry Regs</title>
+<style>
+  :root {
+    --bg: #f6f7f9; --panel: #ffffff; --text: #1b1f24; --muted: #5b6470;
+    --line: #dde1e6; --accent: #b45309; --user: #1f2937; --user-text: #ffffff; --chip: #f1f3f5;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14171a; --panel: #1d2125; --text: #e7eaee; --muted: #9aa4b0;
+      --line: #2e353c; --accent: #f59e0b; --user: #e7eaee; --user-text: #14171a; --chip: #262c32;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+         font: 16px/1.55 system-ui, "Segoe UI", Tahoma, sans-serif; }
+  .page { max-width: 780px; margin: 0 auto; padding: 16px; min-height: 100vh;
+          display: flex; flex-direction: column; }
+  header h1 { font-size: 1.25rem; margin: 8px 0 2px; }
+  header p { margin: 0 0 12px; color: var(--muted); font-size: .92rem; }
+  .examples { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+  .examples button { background: var(--chip); color: var(--text); border: 1px solid var(--line);
+                     border-radius: 999px; padding: 6px 12px; font: inherit; font-size: .85rem; cursor: pointer; }
+  #log { flex: 1; display: flex; flex-direction: column; gap: 12px; padding-bottom: 12px; }
+  .msg { max-width: 92%; padding: 10px 14px; border-radius: 14px; white-space: pre-wrap; overflow-wrap: anywhere; }
+  .msg.user { align-self: flex-end; background: var(--user); color: var(--user-text); }
+  .msg.bot { align-self: flex-start; background: var(--panel); border: 1px solid var(--line); }
+  .msg.error { border-color: #dc2626; }
+  .steps { margin-top: 8px; font-size: .8rem; color: var(--muted); }
+  .cites { margin: 10px 0 0; padding: 0; list-style: none; font-size: .86rem; border-top: 1px solid var(--line); }
+  .cites li { padding-top: 8px; }
+  .cites b { color: var(--accent); }
+  details { margin-top: 4px; color: var(--muted); }
+  details p { margin: 4px 0 0; white-space: pre-wrap; }
+  form { position: sticky; bottom: 0; background: var(--bg); padding: 8px 0 4px; display: flex; gap: 8px; flex-wrap: wrap; }
+  textarea { flex: 1 1 260px; min-height: 48px; max-height: 160px; resize: vertical; padding: 10px 12px;
+             border: 1px solid var(--line); border-radius: 12px; background: var(--panel); color: var(--text); font: inherit; }
+  select, form button { border: 1px solid var(--line); border-radius: 12px; padding: 0 14px; min-height: 48px;
+                        font: inherit; background: var(--panel); color: var(--text); }
+  form button { background: var(--accent); color: #fff; border-color: var(--accent); cursor: pointer; }
+  form button:disabled { opacity: .6; cursor: wait; }
+</style>
+</head>
+<body>
+<div class="page">
+  <header>
+    <h1>SiteSentry Regs</h1>
+    <p>Ask about UAE construction-safety rules in English or Arabic. Every answer cites the clause it came from.</p>
+  </header>
+  <div class="examples" id="examples"></div>
+  <div id="log" aria-live="polite"></div>
+  <form id="form">
+    <textarea id="input" dir="auto" placeholder="Ask a question / اكتب سؤالك" required></textarea>
+    <select id="engine" title="Which agent implementation answers">
+      <option value="native">Hand-written agent</option>
+      <option value="langchain">LangChain agent</option>
+    </select>
+    <button id="send" type="submit">Send</button>
+  </form>
+</div>
+<script>
+const EXAMPLES = [
+  "How high must a guard rail be?",
+  "SiteSentry flagged no_harness near a roof edge. Which rule does that break?",
+  "متى يجب فحص معدات العمل في الأماكن المرتفعة؟",
+  "Who prepares the construction safety and health plan?",
+];
+const log = document.getElementById("log");
+const form = document.getElementById("form");
+const input = document.getElementById("input");
+const send = document.getElementById("send");
+const engine = document.getElementById("engine");
+let sessionId = null;   // returned by the first reply; sending it back gives the agent memory
+
+function el(tag, className, text) {
+  const node = document.createElement(tag);
+  if (className) node.className = className;
+  if (text !== undefined) node.textContent = text;   // textContent: never inserts HTML
+  return node;
+}
+
+function addMessage(kind, text) {
+  const node = el("div", "msg " + kind, text);
+  node.dir = "auto";                                  // right-to-left automatically for Arabic
+  log.appendChild(node);
+  node.scrollIntoView({ behavior: "smooth", block: "end" });
+  return node;
+}
+
+// Show the model's simple Markdown (**bold**, "* " bullets, "#" headings) as real formatting.
+// Built with DOM nodes, never innerHTML, so model text can never inject HTML.
+function renderAnswer(node, text) {
+  node.textContent = "";
+  for (const rawLine of text.split("\n")) {
+    const line = rawLine.replace(/^\s*[*-]\s+/, "• ").replace(/^#+\s*/, "");
+    line.split(/(\*\*[^*]+\*\*)/).forEach(part => {
+      const bold = part.match(/^\*\*([^*]+)\*\*$/);
+      node.appendChild(bold ? el("b", "", bold[1]) : document.createTextNode(part));
+    });
+    node.appendChild(document.createTextNode("\n"));
+  }
+}
+
+function showReply(node, reply) {
+  renderAnswer(node, reply.answer.trim());
+  if (reply.steps.length) {
+    const calls = reply.steps.map(s => s.tool + "(" + Object.values(s.arguments).join(", ") + ")");
+    node.appendChild(el("div", "steps", "Tools used: " + calls.join(" → ")));
+  }
+  if (reply.citations.length) {
+    const list = el("ul", "cites");
+    for (const c of reply.citations) {
+      const item = el("li");
+      item.appendChild(el("b", "", "[" + c.number + "] "));
+      item.appendChild(document.createTextNode(
+        c.document + ", clause " + c.clause + " “" + c.heading + "”, page " + c.page + " (" + c.language + ")"));
+      const details = el("details");
+      details.appendChild(el("summary", "", "Show clause text"));
+      const text = el("p", "", c.content);
+      text.dir = "auto";
+      details.appendChild(text);
+      item.appendChild(details);
+      list.appendChild(item);
+    }
+    node.appendChild(list);
+  }
+}
+
+async function ask(message) {
+  addMessage("user", message);
+  const pending = addMessage("bot", "Searching the regulations…");
+  send.disabled = true;
+  try {
+    const response = await fetch("/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message, session_id: sessionId, engine: engine.value }),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.detail || ("HTTP " + response.status));
+    sessionId = data.session_id;
+    showReply(pending, data);
+  } catch (error) {
+    pending.classList.add("error");
+    pending.textContent = "Something went wrong: " + error.message;
+  } finally {
+    send.disabled = false;
+    pending.scrollIntoView({ behavior: "smooth", block: "end" });
+  }
+}
+
+form.addEventListener("submit", event => {
+  event.preventDefault();
+  const message = input.value.trim();
+  if (!message || send.disabled) return;
+  input.value = "";
+  ask(message);
+});
+input.addEventListener("keydown", event => {
+  if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); form.requestSubmit(); }
+});
+for (const example of EXAMPLES) {
+  const button = el("button", "", example);
+  button.type = "button";
+  button.dir = "auto";
+  button.addEventListener("click", () => { if (!send.disabled) ask(example); });
+  document.getElementById("examples").appendChild(button);
+}
+</script>
+</body>
+</html>

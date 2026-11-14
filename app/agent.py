@@ -40,9 +40,9 @@ You have tools that look up official codes of practice. Rules:
 - Use only what the tools return. If they do not answer the question, say so plainly and do not guess.
 - Answer in the language of the user's latest message (Arabic or English).
 - Be short and practical: a site engineer should be able to act on the answer.
-- Earlier answers in this conversation show their sources written out, like (OSHJ-CoP-04 clause 5.4.1).
-  Use the conversation to understand follow-up questions such as "and for stepladders?", but in your
-  new answer always cite with the bracketed source numbers from this turn's tool results, like [1]."""
+- Earlier answers in this conversation end with a "Sources used" note instead of numbers. Use the
+  conversation to understand follow-up questions such as "and for stepladders?", but still call a tool
+  for the new question and cite its results with bracketed source numbers, like [1]."""
 
 # What the model is told about each tool: a name, a description and the arguments (JSON Schema).
 # The model reads these descriptions to decide which tool to call, so they matter.
@@ -145,20 +145,24 @@ def run_tool(name: str, arguments: dict, registry: SourceRegistry) -> dict:
     }
 
 
-def with_explicit_citations(answer: str, sources: list[dict]) -> str:
-    """Rewrite [2] as (OSHJ-CoP-04 clause 5.4.1) before saving an answer to memory.
+def for_memory(answer: str, sources: list[dict], cited: list[int]) -> str:
+    """Prepare an answer for saving to conversation memory.
 
-    Source numbers only mean something inside one request. Written out in full,
-    the citation still makes sense when the model re-reads it in a later turn.
+    Source numbers like [2] only mean something inside one request, so they are
+    removed from the text, and the clauses that were cited are listed once at the
+    end. (An earlier version wrote each citation out inline; the model then copied
+    that style in later answers instead of using numbers, which broke citations.)
     """
-    def replace(match: re.Match) -> str:
-        number = int(match.group(1))
-        if 1 <= number <= len(sources):
-            source = sources[number - 1]
-            return f"({source['document']} clause {source['clause']})"
-        return match.group(0)
-
-    return re.sub(r"\[(\d+)\]", replace, answer)
+    text = re.sub(r"\s*\[\d+\]", "", answer).strip()
+    if not cited:
+        return text
+    clauses = []
+    for number in cited:
+        source = sources[number - 1]
+        label = f"{source['document']} clause {source['clause']}"
+        if label not in clauses:
+            clauses.append(label)
+    return f"{text}\n\n(Sources used in this answer: {'; '.join(clauses)})"
 
 
 def run_agent(message: str, history: list[dict] | None = None) -> AgentResult:

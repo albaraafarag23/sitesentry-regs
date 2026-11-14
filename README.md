@@ -22,9 +22,11 @@ A: At least 950 mm, with an intermediate rail and gaps of no more than 470 mm [1
 | Vector search | PostgreSQL + pgvector, cosine distance, HNSW index. Each language is searched separately and the results are interleaved. | `app/db.py`, `app/tools.py` |
 | RAG endpoint | One search, then the LLM answers from numbered sources and must cite them. | `app/answer.py` |
 | Agent | The LLM chooses its own tools in a loop (search, fetch a clause, list documents) and remembers the conversation. | `app/agent.py` |
+| LangChain agent | The same agent built with LangChain/LangGraph (`create_agent`, `@tool`), selectable per request, to compare a framework with the hand-written loop. | `app/agent_langchain.py` |
+| Chat page | A single-file web page for `/chat`: Arabic right-to-left support, tool trace and expandable citations. | `app/static/index.html` |
 | MCP server | The same tools exposed over the Model Context Protocol for Claude Desktop, IDEs and other MCP clients. | `app/mcp_server.py` |
 | Evaluation | 47 labelled questions; reports hit@k and MRR for retrieval and citation accuracy for answers. | `app/evaluate.py`, `data/eval/` |
-| Tests and CI | pytest (40 tests) and a GitHub Actions workflow with a pgvector service. | `tests/`, `.github/workflows/ci.yml` |
+| Tests and CI | pytest (43 tests) and a GitHub Actions workflow with a pgvector service. | `tests/`, `.github/workflows/ci.yml` |
 
 ```
 PDF -> pages -> clauses (chunks) -> embeddings -> PostgreSQL + pgvector        (ingestion, run once)
@@ -95,13 +97,13 @@ python -m app.ingest                      # chunk, embed and store them
 uvicorn app.main:app --reload
 ```
 
-Interactive docs: http://localhost:8000/docs
+Chat page: http://localhost:8000/ and interactive API docs: http://localhost:8000/docs
 
 | Endpoint | Purpose |
 |---|---|
 | `POST /search` | Retrieval only, no LLM. Body: `{"question": "..."}` |
 | `POST /ask` | Plain RAG: one search, one cited answer. Body: `{"question": "..."}` |
-| `POST /chat` | Agent with memory. Body: `{"message": "...", "session_id": "..."}`; send back the `session_id` from the reply to continue the conversation. |
+| `POST /chat` | Agent with memory. Body: `{"message": "...", "session_id": "...", "engine": "native"}`; send back the `session_id` from the reply to continue the conversation. `engine` is `native` (hand-written loop) or `langchain`. |
 
 ```bash
 curl -X POST localhost:8000/chat -H "Content-Type: application/json" \

@@ -3,17 +3,21 @@
   POST /search  retrieval only (no LLM)
   POST /ask     plain RAG: one search, one answer
   POST /chat    agent: chooses its own tools, remembers the conversation
+  GET  /        a small chat web page that uses /chat
 """
 
 import os
 import uuid
 from contextlib import asynccontextmanager
+from pathlib import Path
+from typing import Literal
 
 from fastapi import FastAPI, HTTPException
+from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 
 from app import db
-from app.agent import run_agent, with_explicit_citations
+from app.agent import for_memory, run_agent
 from app.answer import LLMError, cited_numbers, generate_answer
 from app.config import HISTORY_LIMIT, LLM_KEY_NAME
 from app.retrieval import retrieve
@@ -62,6 +66,10 @@ class Answer(BaseModel):
 class ChatMessage(BaseModel):
     message: str = Field(min_length=1, max_length=2000, examples=["How should a ladder be secured?"])
     session_id: str | None = Field(default=None, description="Send the id from the last reply to continue a conversation.")
+    engine: Literal["native", "langchain"] = Field(
+        default="native",
+        description="native = hand-written tool loop (app/agent.py); langchain = LangChain/LangGraph agent.",
+    )
 
 
 class ToolStep(BaseModel):
@@ -71,6 +79,7 @@ class ToolStep(BaseModel):
 
 class ChatReply(BaseModel):
     session_id: str
+    engine: str
     answer: str
     citations: list[Source]
     steps: list[ToolStep]     # which tools the agent called, in order
@@ -83,6 +92,12 @@ def to_sources(chunks: list[dict]) -> list[Source]:
 def require_llm_key(name: str) -> None:
     if not os.getenv(name):
         raise HTTPException(503, f"{name} is not set. Add it to .env, or use /search.")
+
+
+@app.get("/", include_in_schema=False)
+def chat_page() -> FileResponse:
+    """The chat web page (a single static HTML file that calls POST /chat)."""
+    return FileResponse(Path(__file__).parent / "static" / "index.html")
 
 
 @app.post("/search", response_model=list[Source])
@@ -125,18 +140,24 @@ def chat(body: ChatMessage) -> ChatReply:
         history = db.get_history(conn, session_id, HISTORY_LIMIT)
 
     try:
-        result = run_agent(body.message, history)
+        if body.engine == "langchain":
+            from app.agent_langchain import run_agent_langchain   # imported here: LangChain is slow to load
+
+            result = run_agent_langchain(body.message, history)
+        else:
+            result = run_agent(body.message, history)
     except LLMError as error:
         raise HTTPException(502, str(error))
 
     # Save both sides of this turn so the next request can see them.
     with db.connect() as conn:
         db.add_message(conn, session_id, "user", body.message)
-        db.add_message(conn, session_id, "assistant", with_explicit_citations(result.answer, result.sources))
+        db.add_message(conn, session_id, "assistant", for_memory(result.answer, result.sources, result.cited))
 
     sources = to_sources(result.sources)
     return ChatReply(
         session_id=session_id,
+        engine=body.engine,
         answer=result.answer,
         citations=[sources[n - 1] for n in result.cited],
         steps=[ToolStep(**step) for step in result.steps],

@@ -19,6 +19,11 @@ anthropic
 # MCP server (exposes the tools to MCP clients)
 mcp
 
+# LangChain version of the agent (app/agent_langchain.py)
+langchain
+langgraph
+langchain-google-genai
+
 # Reads settings from the .env file
 python-dotenv
 
