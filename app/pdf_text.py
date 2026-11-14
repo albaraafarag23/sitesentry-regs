@@ -5,6 +5,8 @@ from pathlib import Path
 
 import pymupdf
 
+from app.lang import detect_language  # noqa: F401  (re-exported for ingest and tests)
+
 # In these Arabic PDFs some joined letter pairs (ligatures) are stored as one glyph,
 # and text extraction returns the two letters in the wrong order:
 #   "الأماكن" comes out as "األماكن",  "المرتفعة" comes out as "املرتفعة".
@@ -22,13 +24,6 @@ def fix_arabic(text: str) -> str:
     for pattern, replacement in _ARABIC_FIXES:
         text = pattern.sub(replacement, text)
     return text
-
-
-def detect_language(text: str) -> str:
-    """Return "ar" if most letters are Arabic, otherwise "en"."""
-    arabic = sum(1 for ch in text if "؀" <= ch <= "ۿ")
-    latin = sum(1 for ch in text if ch.isascii() and ch.isalpha())
-    return "ar" if arabic > latin else "en"
 
 
 def extract_pages(path: Path) -> list[str]:

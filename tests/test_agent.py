@@ -78,3 +78,12 @@ def test_langchain_tools_match_the_native_tools():
 def test_every_declared_tool_has_a_function():
     declared = {declaration.name for declaration in agent.TOOL_DECLARATIONS}
     assert declared == set(agent.TOOL_FUNCTIONS)
+
+
+def test_answer_language_is_decided_in_code_from_the_question():
+    from app.lang import language_instruction
+
+    assert "in English" in language_instruction("SiteSentry flagged no_harness near a roof edge")
+    assert "in Arabic" in language_instruction("متى يجب فحص معدات العمل في الأماكن المرتفعة؟")
+    # A mostly Arabic question that mentions an English document code is still Arabic.
+    assert "in Arabic" in language_instruction("ما هي متطلبات OSHJ-CoP-04 للسلالم؟")

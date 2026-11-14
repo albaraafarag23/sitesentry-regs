@@ -15,6 +15,7 @@ import re
 import time
 
 from app.config import ANTHROPIC_MODEL, GEMINI_MODEL, LLM_PROVIDER
+from app.lang import language_instruction
 
 RATE_LIMIT_RETRIES = 3
 
@@ -51,7 +52,7 @@ def cited_numbers(answer: str, source_count: int) -> list[int]:
 
 
 def build_prompt(question: str, chunks: list[dict]) -> str:
-    return f"Sources:\n\n{format_sources(chunks)}\n\nQuestion: {question}"
+    return f"Sources:\n\n{format_sources(chunks)}\n\nQuestion: {question}\n\n{language_instruction(question)}"
 
 
 class LLMError(Exception):

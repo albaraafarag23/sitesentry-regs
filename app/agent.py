@@ -25,6 +25,7 @@ from google.genai import types
 from app import tools
 from app.answer import LLMError, cited_numbers, gemini_generate
 from app.config import GEMINI_MODEL
+from app.lang import language_instruction
 
 MAX_STEPS = 6   # safety limit on model <-> tool round trips for one question
 
@@ -172,7 +173,7 @@ def run_agent(message: str, history: list[dict] | None = None) -> AgentResult:
         http_options=types.HttpOptions(timeout=60_000),
     )
     config = types.GenerateContentConfig(
-        system_instruction=SYSTEM_PROMPT,
+        system_instruction=f"{SYSTEM_PROMPT}\n- {language_instruction(message)}",
         tools=[types.Tool(function_declarations=TOOL_DECLARATIONS)],
     )
 

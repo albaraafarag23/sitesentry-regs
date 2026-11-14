@@ -22,6 +22,7 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from app.agent import MAX_STEPS, SYSTEM_PROMPT, AgentResult, SourceRegistry, run_tool
 from app.answer import LLMError, cited_numbers
 from app.config import GEMINI_MODEL, TOP_K
+from app.lang import language_instruction
 
 
 def build_tools(registry: SourceRegistry, steps: list[dict]) -> list:
@@ -91,7 +92,11 @@ def run_agent_langchain(message: str, history: list[dict] | None = None) -> Agen
         timeout=60,
         max_retries=3,          # also retries when the free tier says "too many requests"
     )
-    agent = create_agent(model, tools=build_tools(registry, steps), system_prompt=SYSTEM_PROMPT)
+    agent = create_agent(
+        model,
+        tools=build_tools(registry, steps),
+        system_prompt=f"{SYSTEM_PROMPT}\n- {language_instruction(message)}",
+    )
 
     messages = [{"role": turn["role"], "content": turn["content"]} for turn in history or []]
     messages.append({"role": "user", "content": message})

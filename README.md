@@ -3,6 +3,8 @@
 A bilingual (Arabic/English) assistant that answers questions about UAE construction-safety
 regulations and cites the exact clause it used.
 
+**Live demo: https://sitesentry-regs.streamlit.app**
+
 It is the companion to SiteSentry, an edge-AI construction-site safety system: SiteSentry
 detects a violation on site (for example `no_harness`), and this assistant says which rule
 it breaks.
@@ -28,7 +30,7 @@ A: At least 950 mm, with an intermediate rail and gaps of no more than 470 mm [1
 | Chat page | A single-file web page for `/chat`: Arabic right-to-left support, tool trace and expandable citations. | `app/static/index.html` |
 | MCP server | The same tools exposed over the Model Context Protocol for Claude Desktop, IDEs and other MCP clients. | `app/mcp_server.py` |
 | Evaluation | 47 labelled questions; reports hit@k and MRR for retrieval and citation accuracy for answers. | `app/evaluate.py`, `data/eval/` |
-| Tests and CI | pytest (47 tests) and a GitHub Actions workflow with a pgvector service. | `tests/`, `.github/workflows/ci.yml` |
+| Tests and CI | pytest (48 tests) and a GitHub Actions workflow with a pgvector service. | `tests/`, `.github/workflows/ci.yml` |
 
 ```
 PDF -> pages -> clauses (chunks) -> embeddings -> PostgreSQL + pgvector        (ingestion, run once)
@@ -144,7 +146,7 @@ Add this to the MCP configuration of Claude Desktop, Claude Code or another clie
 
 - **Database:** Neon (free plan), PostgreSQL with pgvector. Load it once from your machine:
   `DATABASE_URL=<neon connection string> python -m app.ingest`
-- **Public demo:** `demo/streamlit_app.py` on Streamlit Community Cloud (free, GitHub login only).
+- **Public demo:** https://sitesentry-regs.streamlit.app runs `demo/streamlit_app.py` on Streamlit Community Cloud (free, GitHub login only).
   It is a thin second front end that calls the same agent, tools and database code as the API.
   `GEMINI_API_KEY` and `DATABASE_URL` are entered as secrets in the Streamlit dashboard.
 - **API server:** one slim Docker container (`Dockerfile`, `requirements-serve.txt`, about 290 MB of
@@ -174,4 +176,5 @@ python -m app.evaluate --answers # also checks generated answers (uses the LLM)
 - [x] Agent with tools and conversation memory, the same tools as an MCP server
 - [x] Evaluation set with measured retrieval figures, pytest, CI workflow, Dockerfile
 - [x] ONNX Runtime inference and a slim server image
-- [ ] Cloud deployment and a recorded demo
+- [x] Cloud deployment (Neon + Streamlit Community Cloud)
+- [ ] Recorded demo
