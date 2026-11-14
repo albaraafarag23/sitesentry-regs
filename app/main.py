@@ -1,15 +1,39 @@
-"""FastAPI service: ask a question, get an answer with clause citations."""
+"""FastAPI service: cited answers about UAE construction-safety regulations.
+
+  POST /search  retrieval only (no LLM)
+  POST /ask     plain RAG: one search, one answer
+  POST /chat    agent: chooses its own tools, remembers the conversation
+"""
 
 import os
+import uuid
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 
+from app import db
+from app.agent import run_agent, with_explicit_citations
 from app.answer import LLMError, cited_numbers, generate_answer
-from app.config import LLM_KEY_NAME
+from app.config import HISTORY_LIMIT, LLM_KEY_NAME
 from app.retrieval import retrieve
 
-app = FastAPI(title="SiteSentry Regs", description="Cited answers about UAE construction-safety regulations.")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Runs once when the server starts: make sure the chat-memory table exists."""
+    try:
+        db.ensure_schema()
+    except Exception as error:   # database not up yet: the API still starts, endpoints will report it
+        print(f"warning: could not prepare the database: {error}")
+    yield
+
+
+app = FastAPI(
+    title="SiteSentry Regs",
+    description="Cited answers about UAE construction-safety regulations.",
+    lifespan=lifespan,
+)
 
 
 class Question(BaseModel):
@@ -17,15 +41,15 @@ class Question(BaseModel):
 
 
 class Source(BaseModel):
-    number: int          # the [n] used in the answer
-    document: str        # e.g. "OSHJ-CoP-04"
+    number: int                       # the [n] used in the answer
+    document: str                     # e.g. "OSHJ-CoP-04"
     doc_title: str
-    language: str        # "en" or "ar"
-    clause: str          # e.g. "4.3.1"
+    language: str                     # "en" or "ar"
+    clause: str                       # e.g. "5.4.1"
     heading: str
     page: int
-    similarity: float    # 1.0 = identical meaning, 0 = unrelated
     content: str
+    similarity: float | None = None   # 1.0 = identical meaning; missing when fetched by clause number
 
 
 class Answer(BaseModel):
@@ -35,11 +59,30 @@ class Answer(BaseModel):
     retrieved: list[Source]   # everything retrieval found, for transparency
 
 
+class ChatMessage(BaseModel):
+    message: str = Field(min_length=1, max_length=2000, examples=["How should a ladder be secured?"])
+    session_id: str | None = Field(default=None, description="Send the id from the last reply to continue a conversation.")
+
+
+class ToolStep(BaseModel):
+    tool: str
+    arguments: dict
+
+
+class ChatReply(BaseModel):
+    session_id: str
+    answer: str
+    citations: list[Source]
+    steps: list[ToolStep]     # which tools the agent called, in order
+
+
 def to_sources(chunks: list[dict]) -> list[Source]:
-    return [
-        Source(number=number, **{**chunk, "similarity": round(float(chunk["similarity"]), 4)})
-        for number, chunk in enumerate(chunks, start=1)
-    ]
+    return [Source(number=number, **chunk) for number, chunk in enumerate(chunks, start=1)]
+
+
+def require_llm_key(name: str) -> None:
+    if not os.getenv(name):
+        raise HTTPException(503, f"{name} is not set. Add it to .env, or use /search.")
 
 
 @app.post("/search", response_model=list[Source])
@@ -50,9 +93,8 @@ def search(body: Question) -> list[Source]:
 
 @app.post("/ask", response_model=Answer)
 def ask(body: Question) -> Answer:
-    """Retrieve relevant clauses, then have the LLM answer from them with citations."""
-    if not os.getenv(LLM_KEY_NAME):
-        raise HTTPException(503, f"{LLM_KEY_NAME} is not set. Add it to .env, or use /search.")
+    """Plain RAG: retrieve relevant clauses, then have the LLM answer from them with citations."""
+    require_llm_key(LLM_KEY_NAME)
 
     chunks = retrieve(body.question)
     if not chunks:
@@ -70,4 +112,32 @@ def ask(body: Question) -> Answer:
         answer=text,
         citations=[sources[n - 1] for n in cited],
         retrieved=sources,
+    )
+
+
+@app.post("/chat", response_model=ChatReply)
+def chat(body: ChatMessage) -> ChatReply:
+    """Agent with memory: it picks its own tools and remembers earlier turns of the session."""
+    require_llm_key("GEMINI_API_KEY")   # the agent uses Gemini function calling
+    session_id = body.session_id or uuid.uuid4().hex
+
+    with db.connect() as conn:
+        history = db.get_history(conn, session_id, HISTORY_LIMIT)
+
+    try:
+        result = run_agent(body.message, history)
+    except LLMError as error:
+        raise HTTPException(502, str(error))
+
+    # Save both sides of this turn so the next request can see them.
+    with db.connect() as conn:
+        db.add_message(conn, session_id, "user", body.message)
+        db.add_message(conn, session_id, "assistant", with_explicit_citations(result.answer, result.sources))
+
+    sources = to_sources(result.sources)
+    return ChatReply(
+        session_id=session_id,
+        answer=result.answer,
+        citations=[sources[n - 1] for n in result.cited],
+        steps=[ToolStep(**step) for step in result.steps],
     )

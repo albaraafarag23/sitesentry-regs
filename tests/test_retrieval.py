@@ -6,28 +6,11 @@
 If the database is not reachable, the tests are skipped instead of failing.
 """
 
-import psycopg
 import pytest
 
-from app import db
 from app.retrieval import retrieve
 
-_skip_reason = ""
-
-
-@pytest.fixture(scope="module", autouse=True)
-def require_ingested_database():
-    global _skip_reason
-    if _skip_reason:
-        pytest.skip(_skip_reason)   # already checked once; do not wait again
-    try:
-        with db.connect() as conn:
-            count = conn.execute("SELECT count(*) AS n FROM chunks").fetchone()["n"]
-    except psycopg.Error:
-        _skip_reason = "database not reachable (run: docker compose up -d)"
-        pytest.skip(_skip_reason)
-    if count == 0:
-        pytest.skip("no chunks in the database (run: python -m app.ingest)")
+pytestmark = pytest.mark.usefixtures("ingested_database")
 
 
 def clauses(results: list[dict]) -> list[tuple[str, str]]:

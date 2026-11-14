@@ -12,8 +12,11 @@ the model cannot invent a clause number that does not exist.
 
 import os
 import re
+import time
 
 from app.config import ANTHROPIC_MODEL, GEMINI_MODEL, LLM_PROVIDER
+
+RATE_LIMIT_RETRIES = 3
 
 SYSTEM_PROMPT = """You answer questions about UAE construction-safety regulations.
 
@@ -55,22 +58,39 @@ class LLMError(Exception):
     """The LLM provider could not produce an answer."""
 
 
+def gemini_generate(client, **request):
+    """Call Gemini, waiting and retrying when the free tier says "too many requests" (HTTP 429).
+
+    The free tier allows only a few requests per minute. The error message says how long
+    to wait ("Please retry in 12.5s"), so we wait that long (at most 40 s) and try again.
+    """
+    from google.genai import errors
+
+    for attempt in range(RATE_LIMIT_RETRIES + 1):
+        try:
+            return client.models.generate_content(**request)
+        except errors.APIError as error:
+            if error.code != 429 or attempt == RATE_LIMIT_RETRIES:
+                raise LLMError(f"Gemini API error {error.code}: {error.message}") from error
+            wait = re.search(r"retry in ([\d.]+)(ms|s)", str(error.message))
+            seconds = float(wait.group(1)) / (1000 if wait.group(2) == "ms" else 1) if wait else 10
+            time.sleep(min(seconds + 1, 40))
+
+
 def _ask_gemini(prompt: str) -> str:
     from google import genai
-    from google.genai import errors, types
+    from google.genai import types
 
     client = genai.Client(
         api_key=os.environ["GEMINI_API_KEY"],
         http_options=types.HttpOptions(timeout=60_000),  # milliseconds; fail instead of hanging
     )
-    try:
-        response = client.models.generate_content(
-            model=GEMINI_MODEL,
-            contents=prompt,
-            config=types.GenerateContentConfig(system_instruction=SYSTEM_PROMPT),
-        )
-    except errors.APIError as error:
-        raise LLMError(f"Gemini API error {error.code}: {error.message}") from error
+    response = gemini_generate(
+        client,
+        model=GEMINI_MODEL,
+        contents=prompt,
+        config=types.GenerateContentConfig(system_instruction=SYSTEM_PROMPT),
+    )
     if not response.text:
         raise LLMError("Gemini returned no text for this question.")
     return response.text.strip()

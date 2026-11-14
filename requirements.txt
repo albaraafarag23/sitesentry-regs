@@ -16,6 +16,9 @@ sentence-transformers
 google-genai
 anthropic
 
+# MCP server (exposes the tools to MCP clients)
+mcp
+
 # Reads settings from the .env file
 python-dotenv
 
