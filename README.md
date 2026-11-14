@@ -61,6 +61,16 @@ documents cannot answer). "hit@k" = the clause containing the answer is in the t
 | Arabic | 10 | 80% | 100% | 100% | 100% | 0.90 |
 | Arabic question, English-only document | 4 | 0% | 75% | 75% | 75% | 0.38 |
 
+**Answers** (plain RAG on `/ask`, model `gemini-3.5-flash-lite`, 8 retrieved clauses)
+
+| Check | Result |
+|---|---|
+| Answerable questions where the answer cites a clause that contains the answer | 42 / 43 (98%) |
+| Unanswerable questions where the answer cites nothing | 3 / 4 |
+
+The one unanswerable miss asked for a noise limit in decibels; the answer cited the general
+personal protective equipment clause instead of citing nothing.
+
 **What the evaluation found.** The first version did one combined search and scored 0% on
 the last row: the embedding model rates same-language text higher, so an Arabic question
 only ever returned Arabic chunks. Searching each language separately and interleaving the
