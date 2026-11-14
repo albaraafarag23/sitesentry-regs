@@ -1,0 +1,19 @@
+# Dependencies for the Streamlit demo (demo/streamlit_app.py) on Streamlit Community Cloud.
+# The same slim set as the Docker server (requirements-serve.txt), plus Streamlit.
+
+streamlit
+psycopg[binary]
+pgvector
+python-dotenv
+
+# Embedding model with ONNX Runtime
+onnxruntime
+sentencepiece
+huggingface_hub
+numpy
+
+# LLM and agent
+google-genai
+langchain
+langgraph
+langchain-google-genai

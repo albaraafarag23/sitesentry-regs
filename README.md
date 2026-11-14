@@ -24,6 +24,7 @@ A: At least 950 mm, with an intermediate rail and gaps of no more than 470 mm [1
 | RAG endpoint | One search, then the LLM answers from numbered sources and must cite them. | `app/answer.py` |
 | Agent | The LLM chooses its own tools in a loop (search, fetch a clause, list documents) and remembers the conversation. | `app/agent.py` |
 | LangChain agent | The same agent built with LangChain/LangGraph (`create_agent`, `@tool`), selectable per request, to compare a framework with the hand-written loop. | `app/agent_langchain.py` |
+| Streamlit demo | The same chat as a Streamlit app, for free public hosting. | `demo/streamlit_app.py` |
 | Chat page | A single-file web page for `/chat`: Arabic right-to-left support, tool trace and expandable citations. | `app/static/index.html` |
 | MCP server | The same tools exposed over the Model Context Protocol for Claude Desktop, IDEs and other MCP clients. | `app/mcp_server.py` |
 | Evaluation | 47 labelled questions; reports hit@k and MRR for retrieval and citation accuracy for answers. | `app/evaluate.py`, `data/eval/` |
@@ -141,15 +142,14 @@ Add this to the MCP configuration of Claude Desktop, Claude Code or another clie
 
 ## Deployment
 
-The API and chat page run as one small Docker container (`Dockerfile`, `requirements-serve.txt`)
-next to a cloud PostgreSQL with pgvector:
-
-- **Database:** Neon (free plan). Load it once from your machine:
+- **Database:** Neon (free plan), PostgreSQL with pgvector. Load it once from your machine:
   `DATABASE_URL=<neon connection string> python -m app.ingest`
-- **Server:** Render (free plan), created from `render.yaml`. `GEMINI_API_KEY` and `DATABASE_URL`
-  are entered as secrets in the Render dashboard.
-
-Run the same container locally with `docker compose --profile full up`.
+- **Public demo:** `demo/streamlit_app.py` on Streamlit Community Cloud (free, GitHub login only).
+  It is a thin second front end that calls the same agent, tools and database code as the API.
+  `GEMINI_API_KEY` and `DATABASE_URL` are entered as secrets in the Streamlit dashboard.
+- **API server:** one slim Docker container (`Dockerfile`, `requirements-serve.txt`, about 290 MB of
+  memory). Run it with `docker compose --profile full up`, or on any container host;
+  `render.yaml` describes it for Render.
 
 ## Tests and evaluation
 
