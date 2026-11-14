@@ -1,0 +1,21 @@
+# Slim dependencies for the deployed API (Dockerfile).
+# No PyTorch and no PDF library: the server only embeds one question at a time
+# with ONNX Runtime; ingestion runs elsewhere with requirements.txt.
+
+fastapi
+uvicorn[standard]
+psycopg[binary]
+pgvector
+python-dotenv
+
+# Embedding model with ONNX Runtime
+onnxruntime
+sentencepiece
+huggingface_hub
+numpy
+
+# LLM and agent
+google-genai
+langchain
+langgraph
+langchain-google-genai

@@ -1,23 +1,24 @@
-# Image for the API (FastAPI + the embedding model).
+# Slim image for the API and chat page. No PyTorch: the embedding model runs on
+# ONNX Runtime, so the whole server fits in a free 512 MB cloud instance.
 FROM python:3.12-slim
 
-# Run as a normal user, not root. Hugging Face Spaces requires user id 1000.
+# Run as a normal user, not root.
 RUN useradd --create-home --uid 1000 app
 WORKDIR /srv
 RUN chown app:app /srv
 USER app
 ENV PATH="/home/app/.local/bin:${PATH}" \
-    HF_HOME=/srv/hf-cache
+    HF_HOME=/srv/hf-cache \
+    EMBEDDING_BACKEND=onnx \
+    EMBEDDING_MODEL=intfloat/multilingual-e5-small \
+    ONNX_MODEL_FILE=onnx/model_qint8_avx512_vnni.onnx
 
-# CPU-only PyTorch first: the default build bundles GPU libraries and is several GB.
-RUN pip install --no-cache-dir --user torch --index-url https://download.pytorch.org/whl/cpu
+COPY --chown=app:app requirements-serve.txt .
+RUN pip install --no-cache-dir --user -r requirements-serve.txt
 
-COPY --chown=app:app requirements.txt .
-RUN pip install --no-cache-dir --user -r requirements.txt
-
-# Download the embedding model at build time, so the container starts fast.
-ENV EMBEDDING_MODEL=intfloat/multilingual-e5-small
-RUN python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('intfloat/multilingual-e5-small')"
+# Download the tokenizer and the quantized model at build time, so the container starts fast.
+RUN python -c "from huggingface_hub import hf_hub_download as get; import os; \
+get(os.environ['EMBEDDING_MODEL'], 'sentencepiece.bpe.model'); get(os.environ['EMBEDDING_MODEL'], os.environ['ONNX_MODEL_FILE'])"
 
 COPY --chown=app:app app ./app
 COPY --chown=app:app data/documents.json ./data/documents.json

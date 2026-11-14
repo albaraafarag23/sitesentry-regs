@@ -100,6 +100,12 @@ def chat_page() -> FileResponse:
     return FileResponse(Path(__file__).parent / "static" / "index.html")
 
 
+@app.get("/health", include_in_schema=False)
+def health() -> dict:
+    """Cheap check used by the cloud host to see that the server is up."""
+    return {"status": "ok"}
+
+
 @app.post("/search", response_model=list[Source])
 def search(body: Question) -> list[Source]:
     """Retrieval only, no LLM. Useful to see what the search finds."""

@@ -1,0 +1,19 @@
+# Render "Blueprint": describes the cloud service so it can be created from this repository.
+# https://render.com/docs/blueprint-spec
+services:
+  - type: web
+    name: sitesentry-regs
+    runtime: docker            # builds the Dockerfile in this repository
+    plan: free                 # 512 MB memory; sleeps after 15 minutes without visitors
+    region: frankfurt          # same region as the Neon database
+    healthCheckPath: /health
+    envVars:
+      - key: LLM_PROVIDER
+        value: gemini
+      - key: GEMINI_MODEL
+        value: gemini-3.5-flash-lite
+      # Secrets: typed into the Render dashboard, never stored in this file.
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: DATABASE_URL
+        sync: false

@@ -12,6 +12,10 @@ pymupdf
 # Hugging Face embedding model runner
 sentence-transformers
 
+# The same model on ONNX Runtime (used by the slim deployed server)
+onnxruntime
+sentencepiece
+
 # LLMs that write the final answer (Gemini by default, Claude optional)
 google-genai
 anthropic

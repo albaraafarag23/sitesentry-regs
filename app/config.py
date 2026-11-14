@@ -21,3 +21,8 @@ TOP_K = int(os.getenv("TOP_K", "8"))
 
 # How many earlier messages of a conversation the agent sees (its "memory window").
 HISTORY_LIMIT = int(os.getenv("HISTORY_LIMIT", "10"))
+
+# How the embedding model is run: "torch" (full precision, for ingestion) or
+# "onnx" (ONNX Runtime with the 8-bit quantized model, for the small deployed server).
+EMBEDDING_BACKEND = os.getenv("EMBEDDING_BACKEND", "torch").lower()
+ONNX_MODEL_FILE = os.getenv("ONNX_MODEL_FILE", "onnx/model_qint8_avx512_vnni.onnx")

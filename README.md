@@ -19,6 +19,7 @@ A: At least 950 mm, with an intermediate rail and gaps of no more than 470 mm [1
 |---|---|---|
 | Clause-aware chunking | Splits each PDF at its numbered clauses, so every chunk keeps its clause number, heading and page. Handles right-to-left Arabic numbering. | `app/chunking.py` |
 | Embeddings | `intfloat/multilingual-e5-small` (Hugging Face) turns text into 384-number vectors; Arabic and English share one vector space. | `app/embeddings.py` |
+| ONNX inference | The deployed server runs the same model as an 8-bit quantized ONNX file with ONNX Runtime and SentencePiece, with no PyTorch, so it fits a free 512 MB instance. | `app/embeddings_onnx.py` |
 | Vector search | PostgreSQL + pgvector, cosine distance, HNSW index. Each language is searched separately and the results are interleaved. | `app/db.py`, `app/tools.py` |
 | RAG endpoint | One search, then the LLM answers from numbered sources and must cite them. | `app/answer.py` |
 | Agent | The LLM chooses its own tools in a loop (search, fetch a clause, list documents) and remembers the conversation. | `app/agent.py` |
@@ -26,7 +27,7 @@ A: At least 950 mm, with an intermediate rail and gaps of no more than 470 mm [1
 | Chat page | A single-file web page for `/chat`: Arabic right-to-left support, tool trace and expandable citations. | `app/static/index.html` |
 | MCP server | The same tools exposed over the Model Context Protocol for Claude Desktop, IDEs and other MCP clients. | `app/mcp_server.py` |
 | Evaluation | 47 labelled questions; reports hit@k and MRR for retrieval and citation accuracy for answers. | `app/evaluate.py`, `data/eval/` |
-| Tests and CI | pytest (43 tests) and a GitHub Actions workflow with a pgvector service. | `tests/`, `.github/workflows/ci.yml` |
+| Tests and CI | pytest (47 tests) and a GitHub Actions workflow with a pgvector service. | `tests/`, `.github/workflows/ci.yml` |
 
 ```
 PDF -> pages -> clauses (chunks) -> embeddings -> PostgreSQL + pgvector        (ingestion, run once)
@@ -79,6 +80,17 @@ only ever returned Arabic chunks. Searching each language separately and interle
 results raised that group to 75% and overall hit@3 from 86% to 95%
 (before: `data/eval/results_retrieval_baseline.json`, after: `data/eval/results_retrieval.json`).
 
+**PyTorch vs ONNX for the question embedding** (documents are always embedded with PyTorch)
+
+| Question embedding | hit@1 | hit@3 | hit@5 | hit@8 | MRR | Process memory after one query |
+|---|---|---|---|---|---|---|
+| PyTorch, full precision | 84% | 95% | 95% | 98% | 0.90 | 1,298 MB |
+| ONNX Runtime, 8-bit quantized | 84% | 93% | 95% | 98% | 0.89 | 259 MB |
+
+The quantized vectors agree with the PyTorch ones to a cosine similarity of 0.997, and one
+question embeds in a few milliseconds. Swapping the `tokenizers` library for the model's native
+SentencePiece file cut the tokenizer's memory from about 270 MB to about 50 MB with identical token ids.
+
 Limits of these numbers: the test set is small and was written by the project author, so it
 is a regression check, not an independent benchmark.
 
@@ -127,6 +139,18 @@ Add this to the MCP configuration of Claude Desktop, Claude Code or another clie
 }
 ```
 
+## Deployment
+
+The API and chat page run as one small Docker container (`Dockerfile`, `requirements-serve.txt`)
+next to a cloud PostgreSQL with pgvector:
+
+- **Database:** Neon (free plan). Load it once from your machine:
+  `DATABASE_URL=<neon connection string> python -m app.ingest`
+- **Server:** Render (free plan), created from `render.yaml`. `GEMINI_API_KEY` and `DATABASE_URL`
+  are entered as secrets in the Render dashboard.
+
+Run the same container locally with `docker compose --profile full up`.
+
 ## Tests and evaluation
 
 ```bash
@@ -149,4 +173,5 @@ python -m app.evaluate --answers # also checks generated answers (uses the LLM)
 - [x] RAG with cited answers (FastAPI, pgvector, Hugging Face embeddings)
 - [x] Agent with tools and conversation memory, the same tools as an MCP server
 - [x] Evaluation set with measured retrieval figures, pytest, CI workflow, Dockerfile
+- [x] ONNX Runtime inference and a slim server image
 - [ ] Cloud deployment and a recorded demo
