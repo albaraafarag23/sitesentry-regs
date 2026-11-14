@@ -105,9 +105,8 @@ def print_report(report: dict) -> None:
             print(f"  missed {detail['id']}: top results were {detail['top']}")
     if "answers" in report:
         a = report["answers"]
-        print(f"
-answer model: {report['answer_model']}")
-        print(f"\nanswers citing an expected clause: {a['cited_correctly']}/{a['answerable_asked']}")
+        print(f"\nanswer model: {report['answer_model']}")
+        print(f"answers citing an expected clause: {a['cited_correctly']}/{a['answerable_asked']}")
         print(f"unanswerable questions refused:    {a['refused_correctly']}/{a['unanswerable_asked']}")
 
 

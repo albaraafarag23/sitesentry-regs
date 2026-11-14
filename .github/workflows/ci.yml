@@ -19,7 +19,7 @@ jobs:
           pip install torch --index-url https://download.pytorch.org/whl/cpu
           pip install -r requirements.txt
       - name: Unit tests
-        run: pytest tests/test_chunking.py tests/test_agent.py
+        run: pytest tests/test_chunking.py tests/test_agent.py tests/test_evaluate.py
 
   # The real pipeline against PostgreSQL + pgvector: ingest the PDFs, run every test,
   # and measure retrieval quality on the evaluation set.
