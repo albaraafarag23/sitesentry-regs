@@ -1,7 +1,7 @@
-# SiteSentry Regs on the Jetson, next to SiteSentry itself (README: "On the Jetson").
-#   docker compose -f docker-compose.jetson.yml up -d --build
-# Reachable only on the Jetson itself (127.0.0.1:8100) until something in front publishes it.
-# Capped in memory and processor time, so it can't take them from the camera's detector.
+# SiteSentry Regs on your own machine: the Jetson next to SiteSentry, or a laptop (README: "On your own machine").
+#   docker compose -f docker-compose.selfhost.yml up -d --build
+# Reachable only on that machine (http://127.0.0.1:8100) until something in front publishes it. It starts again
+# after a reboot. Capped in memory and processor time, so on the Jetson it can't take them from the detector.
 name: regs
 services:
   db:
@@ -25,7 +25,8 @@ services:
     build:
       context: .
       args:
-        ONNX_MODEL_FILE: onnx/model.onnx   # the full-precision model: the 8-bit one is for Intel/AMD
+        # the full-precision model runs on any processor; the 8-bit one (the Dockerfile's default) is Intel/AMD only
+        ONNX_MODEL_FILE: ${ONNX_MODEL_FILE:-onnx/model.onnx}
     restart: unless-stopped
     env_file: .env                          # GEMINI_API_KEY
     environment:
