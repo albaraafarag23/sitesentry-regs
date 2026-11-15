@@ -26,3 +26,5 @@ HISTORY_LIMIT = int(os.getenv("HISTORY_LIMIT", "10"))
 # "onnx" (ONNX Runtime with the 8-bit quantized model, for the small deployed server).
 EMBEDDING_BACKEND = os.getenv("EMBEDDING_BACKEND", "torch").lower()
 ONNX_MODEL_FILE = os.getenv("ONNX_MODEL_FILE", "onnx/model_qint8_avx512_vnni.onnx")
+# Processor threads the embedding model may use; 0 = ONNX Runtime decides (all cores).
+ONNX_THREADS = int(os.getenv("ONNX_THREADS") or 0)

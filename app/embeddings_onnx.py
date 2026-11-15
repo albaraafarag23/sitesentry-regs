@@ -22,7 +22,7 @@ import onnxruntime
 import sentencepiece
 from huggingface_hub import hf_hub_download
 
-from app.config import EMBEDDING_MODEL, ONNX_MODEL_FILE
+from app.config import EMBEDDING_MODEL, ONNX_MODEL_FILE, ONNX_THREADS
 
 MAX_TOKENS = 512                 # the model's limit, including the two special tokens
 BOS, EOS, UNK = 0, 2, 3  # special token ids of XLM-RoBERTa, the model E5 is built on
@@ -36,6 +36,8 @@ def _load() -> tuple[sentencepiece.SentencePieceProcessor, onnxruntime.Inference
     )
     options = onnxruntime.SessionOptions()
     options.enable_cpu_mem_arena = False     # do not keep a large memory pool around
+    if ONNX_THREADS:                         # leave the other processor cores to whatever shares the machine
+        options.intra_op_num_threads = ONNX_THREADS
     session = onnxruntime.InferenceSession(
         hf_hub_download(EMBEDDING_MODEL, ONNX_MODEL_FILE),
         options,

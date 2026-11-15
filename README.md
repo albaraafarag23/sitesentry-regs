@@ -153,6 +153,25 @@ Add this to the MCP configuration of Claude Desktop, Claude Code or another clie
   memory). Run it with `docker compose --profile full up`, or on any container host;
   `render.yaml` describes it for Render.
 
+### On the Jetson, next to SiteSentry
+
+`docker-compose.jetson.yml` runs the API, the chat page and the database on the same Jetson as SiteSentry:
+
+```bash
+# on the Jetson, in this folder, with GEMINI_API_KEY in .env
+docker compose -f docker-compose.jetson.yml up -d --build
+# fill the database once: copy it from a machine that has ingested the documents
+docker exec regs-db-1 pg_dump -U regs -d regs --no-owner --clean --if-exists | ssh jetson 'docker exec -i regs-db-1 psql -q -U regs -d regs'
+```
+
+It listens on `127.0.0.1:8100` only, so nothing is public until something in front publishes it. ARM
+processors can't use the 8-bit model the cloud image uses, so this build takes the full-precision one
+(`onnx/model.onnx`). The containers are capped (API 1 GB and 2 cores, 2 threads for the embedding model;
+database 512 MB), so the camera's detector keeps its share.
+
+Measured on the Jetson Orin Nano, 2026-11-16: a search takes about 0.1-0.2 s, an answer 1-2 s (Gemini's
+time), the API holds about 650 MB of memory, and 330 searches in 30 s left the detector at its 33 frames a second.
+
 ## Tests and evaluation
 
 ```bash

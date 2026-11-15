@@ -7,11 +7,14 @@ RUN useradd --create-home --uid 1000 app
 WORKDIR /srv
 RUN chown app:app /srv
 USER app
+# The 8-bit model below is built for Intel/AMD processors (cloud hosts). On an ARM machine such as the Jetson,
+# build with --build-arg ONNX_MODEL_FILE=onnx/model.onnx (docker-compose.jetson.yml does).
+ARG ONNX_MODEL_FILE=onnx/model_qint8_avx512_vnni.onnx
 ENV PATH="/home/app/.local/bin:${PATH}" \
     HF_HOME=/srv/hf-cache \
     EMBEDDING_BACKEND=onnx \
     EMBEDDING_MODEL=intfloat/multilingual-e5-small \
-    ONNX_MODEL_FILE=onnx/model_qint8_avx512_vnni.onnx
+    ONNX_MODEL_FILE=${ONNX_MODEL_FILE}
 
 COPY --chown=app:app requirements-serve.txt .
 RUN pip install --no-cache-dir --user -r requirements-serve.txt

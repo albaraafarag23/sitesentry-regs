@@ -1,0 +1,43 @@
+# SiteSentry Regs on the Jetson, next to SiteSentry itself (README: "On the Jetson").
+#   docker compose -f docker-compose.jetson.yml up -d --build
+# Reachable only on the Jetson itself (127.0.0.1:8100) until something in front publishes it.
+# Capped in memory and processor time, so it can't take them from the camera's detector.
+name: regs
+services:
+  db:
+    image: pgvector/pgvector:pg17
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: regs
+      POSTGRES_PASSWORD: ${REGS_DB_PASSWORD:-regs}   # never published: only the api container reaches it
+      POSTGRES_DB: regs
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U regs -d regs"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+    mem_limit: 512m
+    cpus: 1.0
+
+  api:
+    build:
+      context: .
+      args:
+        ONNX_MODEL_FILE: onnx/model.onnx   # the full-precision model: the 8-bit one is for Intel/AMD
+    restart: unless-stopped
+    env_file: .env                          # GEMINI_API_KEY
+    environment:
+      DATABASE_URL: postgresql://regs:${REGS_DB_PASSWORD:-regs}@db:5432/regs
+      ONNX_THREADS: "2"
+    ports:
+      - "127.0.0.1:8100:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    mem_limit: 1g
+    cpus: 2.0
+
+volumes:
+  pgdata:
