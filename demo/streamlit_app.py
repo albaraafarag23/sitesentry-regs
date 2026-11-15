@@ -28,7 +28,7 @@ try:
 except Exception:
     pass                                            # running locally: values come from .env instead
 
-from app import db  # noqa: E402
+from app import db, limits  # noqa: E402
 from app.agent import for_memory, run_agent  # noqa: E402
 from app.answer import LLMError  # noqa: E402
 from app.config import HISTORY_LIMIT  # noqa: E402
@@ -127,9 +127,19 @@ if question:
     with st.chat_message("user"):
         st.markdown(question)
     with st.chat_message("assistant"):
+        busy = None
+        if asked < MAX_QUESTIONS_PER_VISIT:
+            # every visitor together, counted in the database: reloading the page doesn't reset it
+            with db.connect() as conn:
+                if db.count_questions(conn, 3600) >= limits.PER_HOUR:
+                    busy = "The demo has had many questions in the last hour. Please try again later."
+                elif db.count_questions(conn, 86400) >= limits.PER_DAY:
+                    busy = "The demo has reached its daily limit of questions. Please try again tomorrow."
         if asked >= MAX_QUESTIONS_PER_VISIT:
             reply = {"role": "assistant", "text": "This demo allows a limited number of questions per visit. "
                                                   "Reload the page to start a new conversation."}
+        elif busy:
+            reply = {"role": "assistant", "text": busy}
         else:
             try:
                 with st.spinner("Searching the regulations…"):

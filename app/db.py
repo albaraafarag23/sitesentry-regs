@@ -127,6 +127,14 @@ def list_documents(conn: psycopg.Connection) -> list[dict]:
 
 # ---------------------------------------------------------------- chat memory
 
+def count_questions(conn: psycopg.Connection, seconds: int) -> int:
+    """How many questions (user messages) all visitors asked in the last `seconds`."""
+    return conn.execute(
+        "SELECT count(*) FROM messages WHERE role = 'user' AND created_at > now() - make_interval(secs => %s)",
+        (seconds,),
+    ).fetchone()[0]
+
+
 def add_message(conn: psycopg.Connection, session_id: str, role: str, content: str) -> None:
     conn.execute(
         "INSERT INTO messages (session_id, role, content) VALUES (%s, %s, %s)",
