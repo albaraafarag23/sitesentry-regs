@@ -153,6 +153,27 @@ Add this to the MCP configuration of Claude Desktop, Claude Code or another clie
   memory). Run it with `docker compose --profile full up`, or on any container host;
   `render.yaml` describes it for Render.
 
+### On your own machine (the Jetson, a laptop)
+
+`docker-compose.selfhost.yml` runs the API, the chat page and the database on one machine. The team runs it on
+the Jetson next to SiteSentry and on a laptop, besides the Streamlit copy:
+
+```bash
+# in this folder, with GEMINI_API_KEY in .env
+docker compose -f docker-compose.selfhost.yml up -d --build
+# fill the database once: ingest the documents (see "Run it"), or copy it from a machine that has them
+docker exec regs-db-1 pg_dump -U regs -d regs --no-owner --clean --if-exists | ssh jetson 'docker exec -i regs-db-1 psql -q -U regs -d regs'
+```
+
+It listens on `127.0.0.1:8100` only (open http://localhost:8100 on that machine), so nothing is public until
+something in front publishes it, and it starts again after a reboot. It uses the full-precision model
+(`onnx/model.onnx`), which runs on any processor; the 8-bit one the cloud image uses is for Intel/AMD only.
+The containers are capped (API 1 GB and 2 cores, 2 threads for the embedding model; database 512 MB), so on
+the Jetson the camera's detector keeps its share. Each copy has its own database and its own question limits.
+
+Measured on the Jetson Orin Nano, 2026-11-16: a search takes about 0.1-0.2 s, an answer 1-2 s (Gemini's
+time), the API holds about 650 MB of memory, and 330 searches in 30 s left the detector at its 33 frames a second.
+
 ## Tests and evaluation
 
 ```bash
