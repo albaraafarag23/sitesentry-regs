@@ -1,0 +1,44 @@
+# SiteSentry Regs on your own machine: the Jetson next to SiteSentry, or a laptop (README: "On your own machine").
+#   docker compose -f docker-compose.selfhost.yml up -d --build
+# Reachable only on that machine (http://127.0.0.1:8100) until something in front publishes it. It starts again
+# after a reboot. Capped in memory and processor time, so on the Jetson it can't take them from the detector.
+name: regs
+services:
+  db:
+    image: pgvector/pgvector:pg17
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: regs
+      POSTGRES_PASSWORD: ${REGS_DB_PASSWORD:-regs}   # never published: only the api container reaches it
+      POSTGRES_DB: regs
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U regs -d regs"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+    mem_limit: 512m
+    cpus: 1.0
+
+  api:
+    build:
+      context: .
+      args:
+        # the full-precision model runs on any processor; the 8-bit one (the Dockerfile's default) is Intel/AMD only
+        ONNX_MODEL_FILE: ${ONNX_MODEL_FILE:-onnx/model.onnx}
+    restart: unless-stopped
+    env_file: .env                          # GEMINI_API_KEY
+    environment:
+      DATABASE_URL: postgresql://regs:${REGS_DB_PASSWORD:-regs}@db:5432/regs
+      ONNX_THREADS: "2"
+    ports:
+      - "127.0.0.1:8100:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    mem_limit: 1g
+    cpus: 2.0
+
+volumes:
+  pgdata:
