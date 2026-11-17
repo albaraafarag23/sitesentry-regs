@@ -161,6 +161,20 @@ python -m app.evaluate           # retrieval metrics (free, about 10 seconds)
 python -m app.evaluate --answers # also checks generated answers (uses the LLM)
 ```
 
+## Limits on questions
+
+Questions that use the LLM run on a free quota, so they are limited (`app/limits.py`, numbers in `.env`):
+`MAX_QUESTIONS_PER_CLIENT_PER_MINUTE` (6, per IP address, on `/ask` and `/chat`), `MAX_QUESTIONS_PER_HOUR`
+(60) and `MAX_QUESTIONS_PER_DAY` (300) for everyone together. Over a limit the API answers 429. The
+Streamlit demo counts every visitor's questions in the database, so reloading the page doesn't reset it.
+`/search` uses no LLM and is not limited.
+
+## In SiteSentry
+
+SiteSentry's incident reports quote the clause each of its rules enforces. The clauses were looked up once with
+this project's search and stored in SiteSentry's plugins, so its reports cite them offline
+(SiteSentry `docs/regulations.md`).
+
 ## Known limitations
 
 - The Arabic PDF stores some joined letters in the wrong order (for example السلامة is

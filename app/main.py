@@ -12,11 +12,11 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Literal
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 
-from app import db
+from app import db, limits
 from app.agent import for_memory, run_agent
 from app.answer import LLMError, cited_numbers, generate_answer
 from app.config import HISTORY_LIMIT, LLM_KEY_NAME
@@ -112,10 +112,21 @@ def search(body: Question) -> list[Source]:
     return to_sources(retrieve(body.question))
 
 
+def within_limits(request: Request) -> None:
+    """Questions that use the LLM are limited per client and in total (app/limits.py): 429 when over."""
+    # behind a cloud host's proxy the client's address is the first X-Forwarded-For entry. A client can fake
+    # it to dodge its own limit, but not the limits for everyone together.
+    forwarded = request.headers.get("x-forwarded-for", "").split(",")[0].strip()
+    reason = limits.check(forwarded or (request.client.host if request.client else ""))
+    if reason:
+        raise HTTPException(429, reason)
+
+
 @app.post("/ask", response_model=Answer)
-def ask(body: Question) -> Answer:
+def ask(body: Question, request: Request) -> Answer:
     """Plain RAG: retrieve relevant clauses, then have the LLM answer from them with citations."""
     require_llm_key(LLM_KEY_NAME)
+    within_limits(request)
 
     chunks = retrieve(body.question)
     if not chunks:
@@ -137,9 +148,10 @@ def ask(body: Question) -> Answer:
 
 
 @app.post("/chat", response_model=ChatReply)
-def chat(body: ChatMessage) -> ChatReply:
+def chat(body: ChatMessage, request: Request) -> ChatReply:
     """Agent with memory: it picks its own tools and remembers earlier turns of the session."""
     require_llm_key("GEMINI_API_KEY")   # the agent uses Gemini function calling
+    within_limits(request)
     session_id = body.session_id or uuid.uuid4().hex
 
     with db.connect() as conn:
